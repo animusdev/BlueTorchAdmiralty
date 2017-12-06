@@ -3,7 +3,7 @@ var/datum/species/shapeshifter/promethean/prometheans
 // Species definition follows.
 /datum/species/shapeshifter/promethean
 
-	name =             "Promethean"
+	name =             SPECIES_PROMETHEAN
 	name_plural =      "Prometheans"
 	blurb =            "What has Science done?"
 	show_ssd =         "totally quiescent"
@@ -11,8 +11,8 @@ var/datum/species/shapeshifter/promethean/prometheans
 	knockout_message = "collapses inwards, forming a disordered puddle of goo."
 	remains_type = /obj/effect/decal/cleanable/ash
 
-	blood_color = "#05FF9B"
-	flesh_color = "#05FFFB"
+	blood_color = "#05ff9b"
+	flesh_color = "#05fffb"
 
 	hunger_factor =    DEFAULT_HUNGER_FACTOR //todo
 	reagent_tag =      IS_SLIME
@@ -34,7 +34,7 @@ var/datum/species/shapeshifter/promethean/prometheans
 	brute_mod =           0.5
 	burn_mod =            2
 	oxy_mod =             0
-	total_health =        120
+	total_health =        240
 	siemens_coefficient = -1
 	rarity_value =        5
 
@@ -63,7 +63,7 @@ var/datum/species/shapeshifter/promethean/prometheans
 		/mob/living/carbon/human/proc/shapeshifter_select_gender
 		)
 
-	valid_transform_species = list(SPECIES_HUMAN, SPECIES_UNATHI, SPECIES_TAJARA, SPECIES_SKRELL, SPECIES_DIONA, SPECIES_RESOMI, "Monkey")
+	valid_transform_species = list(SPECIES_HUMAN, SPECIES_UNATHI, SPECIES_TAJARA, SPECIES_SKRELL, SPECIES_DIONA, "Monkey")
 	monochromatic = 1
 
 	var/heal_rate = 5 // Temp. Regen per tick.

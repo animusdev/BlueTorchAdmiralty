@@ -45,11 +45,11 @@
 
 	// update the invisibility and icon
 	hide(var/intact)
-		invisibility = intact ? 101 : 0
-		updateicon()
+		set_invisibility(intact ? 101 : 0)
+		update_icon()
 
 	// update the icon_state
-	proc/updateicon()
+	update_icon()
 		var/state="floor_magnet"
 		var/onstate=""
 		if(!on)
@@ -129,7 +129,7 @@
 
 
 
-	process()
+	Process()
 		if(stat & NOPOWER)
 			on = 0
 
@@ -168,7 +168,7 @@
 						qdel(src)
 		*/
 
-		updateicon()
+		update_icon()
 
 
 	proc/magnetic_process() // proc that actually does the pulling
@@ -239,7 +239,7 @@
 			filter_path() // renders rpath
 
 
-	process()
+	Process()
 		if(magnets.len == 0 && autolink)
 			for(var/obj/machinery/magnetic_module/M in world)
 				if(M.freq == frequency && M.code == code)

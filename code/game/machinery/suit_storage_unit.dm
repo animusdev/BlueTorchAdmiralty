@@ -597,14 +597,14 @@
 /obj/machinery/suit_storage_unit/attackby(obj/item/I as obj, mob/user as mob)
 	if(!src.ispowered)
 		return
-	if(istype(I, /obj/item/weapon/screwdriver))
+	if(isScrewdriver(I))
 		src.panelopen = !src.panelopen
 		playsound(src.loc, 'sound/items/Screwdriver.ogg', 100, 1)
 		to_chat(user, text("<span class='notice'>You [] the unit's maintenance panel.</span>",(src.panelopen ? "open up" : "close") ))
 		src.updateUsrDialog()
 		return
-	if ( istype(I, /obj/item/weapon/grab) )
-		var/obj/item/weapon/grab/G = I
+	if ( istype(I, /obj/item/grab) )
+		var/obj/item/grab/G = I
 		if( !(ismob(G.affecting)) )
 			return
 		if (!src.isopen)
@@ -740,9 +740,9 @@
 	var/electrified = 0
 
 	//Departments that the cycler can paint suits to look like.
-	var/list/departments = list("Engineering","Mining","Medical","Security","Atmos","Science")
+	var/list/departments = list("Engineering","Mining","Medical","Security","Atmos","Science","Pilot")
 	//Species that the suits can be configured to fit.
-	var/list/species = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_TAJARA,SPECIES_RESOMI)
+	var/list/species = list(SPECIES_HUMAN,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_TAJARA)
 
 	var/target_department
 	var/target_species
@@ -771,43 +771,50 @@
 	model_text = "Engineering"
 	req_access = list(access_construction)
 	departments = list("Engineering","Atmos")
-	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_RESOMI) //Add Unathi when sprites exist for their suits.
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI) //Add Unathi when sprites exist for their suits.
 
 /obj/machinery/suit_cycler/mining
 	name = "Mining suit cycler"
 	model_text = "Mining"
 	req_access = list(access_mining)
 	departments = list("Mining")
-	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_RESOMI)
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI)
 
 /obj/machinery/suit_cycler/science
 	name = "Excavation suit cycler"
 	model_text = "Excavation"
 	req_access = list(access_xenoarch)
 	departments = list("Science")
-	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_RESOMI)
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI)
 
 /obj/machinery/suit_cycler/security
 	name = "Security suit cycler"
 	model_text = "Security"
 	req_access = list(access_security)
 	departments = list("Security")
-	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_RESOMI)
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI)
 
 /obj/machinery/suit_cycler/medical
 	name = "Medical suit cycler"
 	model_text = "Medical"
 	req_access = list(access_medical)
 	departments = list("Medical")
-	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_RESOMI)
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI)
 
 /obj/machinery/suit_cycler/syndicate
 	name = "Nonstandard suit cycler"
 	model_text = "Nonstandard"
 	req_access = list(access_syndicate)
 	departments = list("Mercenary")
-	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI,SPECIES_RESOMI)
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI)
 	can_repair = 1
+
+/obj/machinery/suit_cycler/pilot
+	name = "Pilot suit cycler"
+	model_text = "Pilot"
+	req_access = list(access_mining_office)
+	departments = list("Pilot")
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI)
 
 /obj/machinery/suit_cycler/attack_ai(mob/user as mob)
 	return src.attack_hand(user)
@@ -819,13 +826,13 @@
 			return
 
 	//Hacking init.
-	if(istype(I, /obj/item/device/multitool) || istype(I, /obj/item/weapon/wirecutters))
+	if(isMultitool(I) || isWirecutter(I))
 		if(panel_open)
 			attack_hand(user)
 		return
 	//Other interface stuff.
-	if(istype(I, /obj/item/weapon/grab))
-		var/obj/item/weapon/grab/G = I
+	if(istype(I, /obj/item/grab))
+		var/obj/item/grab/G = I
 
 		if(!(ismob(G.affecting)))
 			return
@@ -855,7 +862,7 @@
 			src.updateUsrDialog()
 
 			return
-	else if(istype(I,/obj/item/weapon/screwdriver))
+	else if(isScrewdriver(I))
 
 		panel_open = !panel_open
 		to_chat(user, "You [panel_open ?  "open" : "close"] the maintenance panel.")
@@ -1049,7 +1056,7 @@
 	src.updateUsrDialog()
 	return
 
-/obj/machinery/suit_cycler/process()
+/obj/machinery/suit_cycler/Process()
 
 	if(electrified > 0)
 		electrified--
@@ -1209,6 +1216,15 @@
 					slot_l_hand_str = "atmos_voidsuit",
 					slot_r_hand_str = "atmos_voidsuit",
 				)
+		if("Explorer")
+			if(helmet)
+				helmet.name = "exploration voidsuit helmet"
+				helmet.icon_state = "helm_explorer"
+				helmet.item_state = "helm_explorer"
+			if(suit)
+				suit.name = "exploration voidsuit"
+				suit.icon_state = "void_explorer"
+
 		if("^%###^%$" || "Mercenary")
 			if(helmet)
 				helmet.name = "blood-red voidsuit helmet"
@@ -1221,6 +1237,14 @@
 					slot_l_hand_str = "syndie_voidsuit",
 					slot_r_hand_str = "syndie_voidsuit",
 				)
+		if("Pilot")
+			if(helmet)
+				helmet.name = "pilot voidsuit helmet"
+				helmet.icon_state = "rig0_pilot"
+				helmet.item_state = "pilot_helm"
+			if(suit)
+				suit.name = "pilot voidsuit"
+				suit.icon_state = "rig-pilot"
 
 	if(helmet) helmet.name = "refitted [helmet.name]"
 	if(suit) suit.name = "refitted [suit.name]"

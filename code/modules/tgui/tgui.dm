@@ -100,7 +100,8 @@
 	var/debugable = check_rights(R_DEBUG, 0, user)
 	user << browse(get_html(debugable), "window=[window_id];[window_size][list2params(window_options)]") // Open the window.
 	if (!custom_browser_id)
-		winset(user, window_id, "on-close=\"uiclose \ref[src]\"") // Instruct the client to signal UI when the window is closed.
+		spawn(2)
+			winset(user, window_id, "on-close=\"uiclose \ref[src]\"") // Instruct the client to signal UI when the window is closed.
 	tgui_process.on_open(src)
 
  /**
@@ -219,8 +220,8 @@
 			"screen"	= src_object.ui_screen,
 			"style"     = style,
 			"interface" = interface,
-			"fancy"     = user.is_preference_enabled(/datum/client_preference/tgui_style),
-			"locked"    = user.is_preference_enabled(/datum/client_preference/tgui_monitor),
+			"fancy"     = user.get_preference_value(/datum/client_preference/tgui_style) == GLOB.PREF_FANCY,
+			"locked"    = user.get_preference_value(/datum/client_preference/tgui_monitor) == GLOB.PREF_PRIMARY,
 			"window"    = window_id,
 			"ref"       = "\ref[src]",
 			"user"      = list(
@@ -253,7 +254,7 @@
 	// Generate the JSON.
 	var/json = json_encode(json_data)
 	// Strip #255/improper.
-	json = replacetext(json, "\proper", ""); json = replacetext(json, "&#255;", "");
+	json = replacetext(json, "\proper", "")
 	json = replacetext(json, "\improper", "")
 	return json
 

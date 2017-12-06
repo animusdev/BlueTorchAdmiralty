@@ -10,6 +10,10 @@
 	ammo_type = /obj/item/ammo_casing/a357
 	var/chamber_offset = 0 //how many empty chambers in the cylinder until you hit a round
 
+/obj/item/weapon/gun/projectile/revolver/AltClick()
+	if(CanPhysicallyInteract(usr))
+		spin_cylinder()
+
 /obj/item/weapon/gun/projectile/revolver/verb/spin_cylinder()
 	set name = "Spin cylinder"
 	set desc = "Fun when you're bored out of your skull."
@@ -36,7 +40,9 @@
 /obj/item/weapon/gun/projectile/revolver/mateba
 	name = "mateba"
 	icon_state = "mateba"
+	caliber = ".50"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
+	ammo_type = /obj/item/ammo_casing/a50
 
 /obj/item/weapon/gun/projectile/revolver/detective
 	name = "revolver"
@@ -90,7 +96,7 @@
 /obj/item/weapon/gun/projectile/revolver/capgun
 	name = "cap gun"
 	desc = "Looks almost like the real thing! Ages 8 and up."
-	icon_state = "revolver"
+	icon_state = "revolver-toy"
 	item_state = "revolver"
 	caliber = "caps"
 	origin_tech = list(TECH_COMBAT = 1, TECH_MATERIAL = 1)
@@ -98,3 +104,21 @@
 	max_shells = 7
 	ammo_type = /obj/item/ammo_casing/cap
 
+/obj/item/weapon/gun/projectile/revolver/capgun/attackby(obj/item/weapon/wirecutters/W, mob/user)
+	if(!istype(W) || icon_state == "revolver")
+		return ..()
+	to_chat(user, "<span class='notice'>You snip off the toy markings off the [src].</span>")
+	name = "revolver"
+	icon_state = "revolver"
+	desc += " Someone snipped off the barrel's toy mark. How dastardly."
+	return 1
+
+/obj/item/weapon/gun/projectile/revolver/webley
+	name = "service revolver"
+	desc = "A rugged top break revolver based on the Webley Mk. VI model, with modern improvements. Uses .44 magnum rounds."
+	icon_state = "webley"
+	item_state = "webley"
+	max_shells = 6
+	caliber = ".44"
+	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
+	ammo_type = /obj/item/ammo_casing/c44

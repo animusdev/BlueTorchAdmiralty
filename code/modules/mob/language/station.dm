@@ -96,9 +96,9 @@
 /datum/language/human/get_random_name(var/gender)
 	if (prob(80))
 		if(gender==FEMALE)
-			return capitalize(pick(first_names_female)) + " " + capitalize(pick(last_names))
+			return capitalize(pick(GLOB.first_names_female)) + " " + capitalize(pick(GLOB.last_names))
 		else
-			return capitalize(pick(first_names_male)) + " " + capitalize(pick(last_names))
+			return capitalize(pick(GLOB.first_names_male)) + " " + capitalize(pick(GLOB.last_names))
 	else
 		return ..()
 
@@ -120,26 +120,7 @@
 /datum/language/machine/get_random_name()
 	if(prob(70))
 		return "[pick(list("PBU","HIU","SINA","ARMA","OSI"))]-[rand(100, 999)]"
-	return pick(ai_names)
-
-/datum/language/resomi
-	name = LANGUAGE_RESOMI
-	desc = "A trilling language spoken by the diminutive Resomi."
-	speech_verb = "chirps"
-	ask_verb = "chirrups"
-	exclaim_verb = "trills"
-	colour = "alien"
-	key = "v"
-	flags = WHITELISTED
-	space_chance = 50
-	syllables = list(
-			"ca", "ra", "ma", "sa", "na", "ta", "la", "sha", "scha", "a", "a",
-			"ce", "re", "me", "se", "ne", "te", "le", "she", "sche", "e", "e",
-			"ci", "ri", "mi", "si", "ni", "ti", "li", "shi", "schi", "i", "i"
-		)
-
-/datum/language/resomi/get_random_name(gender)
-	return ..(gender, 1, 4, 1.5)
+	return pick(GLOB.ai_names)
 
 //Syllable Lists
 /*
@@ -209,3 +190,36 @@
 	colour = "tajaran"
 	key = "l"
 	flags = WHITELISTED | SIGNLANG | NO_STUTTER | NONVERBAL
+
+/datum/language/confederate
+	name = LANGUAGE_INDEPENDENT
+	desc = "The official language of the Terran Colonial Confederation, evolved from a pidgin of Eastern European languages and English."
+	speech_verb = "speaks"
+	colour = "terran"
+	key = "r"
+	syllables = list("rus","zem","ave","groz","ski","ska","ven","konst","pol","lin","svy",
+	"danya","da","mied","zan","das","krem","myka","to","st","no","na","ni",
+	"ko","ne","en","po","ra","li","on","byl","cto","eni","ost","ol","ego","ver","stv","pro")
+
+/datum/language/nabber
+	name = LANGUAGE_NABBER
+	desc = "A strange language that can be understood both by the sounds made and by the movement needed to create those sounds."
+	signlang_verb = list("chitters", "grinds its mouthparts", "chitters and grinds its mouthparts")
+	key = "n"
+	flags = RESTRICTED | SIGNLANG | NO_STUTTER | NONVERBAL
+	colour = ".nabber_lang"
+
+/datum/language/nabber/get_random_name(var/gender)
+	if(gender == FEMALE)
+		return capitalize(pick(GLOB.first_names_female))
+	else
+		return capitalize(pick(GLOB.first_names_male))
+
+/datum/language/spacer
+	name = LANGUAGE_SPACER
+	desc = "A pidgin language spoken by haulers, merchants, traders, travellers, and cocky fly-boys across the galaxy."
+	colour = "spacer"
+	key = "v"
+	syllables = list ("die", "en", "skei", "van", "son", "der", "aar", "ch", "op", "ruk", "aa", "be", "ne", "het",
+ 	"ek", "ras", "ver", "zan", "das", "waa", "geb", "vol", "lu", "min", "breh", "rus", "stv", "ee", "goe", "sk",
+ 	"la", "ver", "we", "ge", "luk", "an", "ar", "at", "es", "et", "bel", "du", "jaa", "ch", "kk", "gh", "ll", "uu", "wat")

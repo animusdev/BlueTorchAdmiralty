@@ -12,7 +12,6 @@ They sell generic supplies and ask for generic supplies.
 	name_language = LANGUAGE_EAL
 	trade_flags = TRADER_MONEY|TRADER_GOODS
 	speech = list("hail_generic"    = "Greetings, I am MERCHANT, Artifical Intelligence onboard ORIGIN, tasked with trading goods in return for thalers and supplies.",
-				"hail_resomi"       = "Greetings, I am MERCHANT, Artifical Intelligence onboard ORIGIN. We wish to trade with you, no more.",
 				"hail_deny"         = "We are sorry, your connection has been blacklisted. Have a nice day.",
 
 				"trade_complete"    = "Thank you for your patronage.",
@@ -41,7 +40,7 @@ They sell generic supplies and ask for generic supplies.
 								/obj/item/weapon/storage/backpack                    = TRADER_ALL,
 								/obj/item/weapon/storage/backpack/cultpack           = TRADER_BLACKLIST,
 								/obj/item/weapon/storage/backpack/holding            = TRADER_BLACKLIST,
-								/obj/item/weapon/storage/backpack/satchel/withwallet = TRADER_BLACKLIST,
+								/obj/item/weapon/storage/backpack/satchel/grey/withwallet = TRADER_BLACKLIST,
 								/obj/item/weapon/storage/backpack/satchel/syndie_kit = TRADER_BLACKLIST_ALL,
 								/obj/item/weapon/storage/backpack/chameleon          = TRADER_BLACKLIST,
 								/obj/item/weapon/storage/backpack/ert                = TRADER_BLACKLIST_ALL,

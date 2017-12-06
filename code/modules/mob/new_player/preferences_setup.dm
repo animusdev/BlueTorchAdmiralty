@@ -8,7 +8,7 @@ datum/preferences
 		h_style = random_hair_style(gender, species)
 		f_style = random_facial_hair_style(gender, species)
 		if(current_species)
-			if(current_species.appearance_flags & HAS_SKIN_TONE)
+			if(current_species.appearance_flags & HAS_A_SKIN_TONE)
 				s_tone = random_skin_tone()
 			if(current_species.appearance_flags & HAS_SKIN_COLOR)
 				r_skin = rand (0,255)
@@ -23,11 +23,11 @@ datum/preferences
 				randomize_hair_color("facial")
 		if(current_species.appearance_flags & HAS_UNDERWEAR)
 			all_underwear.Cut()
-			for(var/datum/category_group/underwear/WRC in global_underwear.categories)
+			for(var/datum/category_group/underwear/WRC in GLOB.underwear.categories)
 				var/datum/category_item/underwear/WRI = pick(WRC.items)
 				all_underwear[WRC.name] = WRI.name
 
-		backbag = rand(1,5)
+		backpack = decls_repository.get_decl(pick(subtypesof(/decl/backpack_outfit)))
 		age = rand(current_species.min_age, current_species.max_age)
 		b_type = RANDOM_BLOOD_TYPE
 		if(H)
@@ -207,16 +207,22 @@ datum/preferences
 	else
 		return
 
+	if((equip_preview_mob & EQUIP_PREVIEW_JOB) && previewJob)
+		mannequin.job = previewJob.title
+		previewJob.equip_preview(mannequin, player_alt_titles[previewJob.title], mannequin.char_branch)
+		update_icon = TRUE
+
 	if((equip_preview_mob & EQUIP_PREVIEW_LOADOUT) && !(previewJob && (equip_preview_mob & EQUIP_PREVIEW_JOB) && (previewJob.type == /datum/job/ai || previewJob.type == /datum/job/cyborg)))
-		var/list/equipped_slots = list() //If more than one item takes the same slot only spawn the first
-		for(var/thing in gear)
+		// Equip custom gear loadout, replacing any job items
+		var/list/loadout_taken_slots = list()
+		for(var/thing in Gear())
 			var/datum/gear/G = gear_datums[thing]
 			if(G)
 				var/permitted = 0
 				if(G.allowed_roles && G.allowed_roles.len)
 					if(previewJob)
-						for(var/job_name in G.allowed_roles)
-							if(previewJob.title == job_name)
+						for(var/job_type in G.allowed_roles)
+							if(previewJob.type == job_type)
 								permitted = 1
 				else
 					permitted = 1
@@ -227,16 +233,9 @@ datum/preferences
 				if(!permitted)
 					continue
 
-				if(G.slot && !(G.slot in equipped_slots))
-					var/metadata = gear[G.display_name]
-					if(mannequin.equip_to_slot_or_del(G.spawn_item(mannequin, metadata), G.slot))
-						equipped_slots += G.slot
-						update_icon = TRUE
-
-	if((equip_preview_mob & EQUIP_PREVIEW_JOB) && previewJob)
-		mannequin.job = previewJob.title
-		previewJob.equip_preview(mannequin, player_alt_titles[previewJob.title], mannequin.char_branch)
-		update_icon = TRUE
+				if(G.slot && G.slot != slot_tie && !(G.slot in loadout_taken_slots) && G.spawn_on_mob(mannequin, gear_list[gear_slot][G.display_name]))
+					loadout_taken_slots.Add(G.slot)
+					update_icon = TRUE
 
 	if(update_icon)
 		mannequin.update_icons()
@@ -246,7 +245,7 @@ datum/preferences
 	mannequin.delete_inventory(TRUE)
 	dress_preview_mob(mannequin)
 
-	preview_icon = icon('icons/effects/effects.dmi', "nothing")
+	preview_icon = icon('icons/effects/128x48.dmi', bgstate)
 	preview_icon.Scale(48+32, 16+32)
 
 	mannequin.dir = NORTH

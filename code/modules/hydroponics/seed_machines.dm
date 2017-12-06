@@ -41,7 +41,7 @@
 	var/failed_task = 0
 	var/disk_needs_genes = 0
 
-/obj/machinery/botany/process()
+/obj/machinery/botany/Process()
 
 	..()
 	if(!active) return
@@ -85,13 +85,13 @@
 			to_chat(user, "You load [W] into [src].")
 		return
 
-	if(istype(W,/obj/item/weapon/screwdriver))
+	if(isScrewdriver(W))
 		open = !open
 		to_chat(user, "<span class='notice'>You [open ? "open" : "close"] the maintenance panel.</span>")
 		return
 
 	if(open)
-		if(istype(W, /obj/item/weapon/crowbar))
+		if(isCrowbar(W))
 			dismantle()
 			return
 
@@ -159,7 +159,7 @@
 		data["hasGenetics"] = 0
 		data["sourceName"] = 0
 
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "botany_isolator.tmpl", "Lysis-isolation Centrifuge UI", 470, 450)
 		ui.set_initial_data(data)
@@ -289,7 +289,7 @@
 	else
 		data["loaded"] = 0
 
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "botany_editor.tmpl", "Bioballistic Delivery UI", 470, 450)
 		ui.set_initial_data(data)

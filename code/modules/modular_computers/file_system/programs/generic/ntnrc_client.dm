@@ -2,6 +2,7 @@
 	filename = "ntnrc_client"
 	filedesc = "NTNet Relay Chat Client"
 	program_icon_state = "command"
+	program_menu_icon = "comment"
 	extended_desc = "This program allows communication over NTNRC network"
 	size = 8
 	requires_ntnet = 1
@@ -28,7 +29,7 @@
 		if(!channel)
 			return 1
 		var/mob/living/user = usr
-		var/message = cp1251_to_utf8(sanitize(input(user, "Enter message or leave blank to cancel: ")))
+		var/message = sanitize(input(user, "Enter message or leave blank to cancel: "), 512)
 		if(!message || !channel)
 			return
 		channel.add_message(message, username)
@@ -65,7 +66,7 @@
 	if(href_list["PRG_newchannel"])
 		. = 1
 		var/mob/living/user = usr
-		var/channel_title = rustoutf(cp1251_to_utf8(sanitize(input(user,"Enter channel name or leave blank to cancel:"))))
+		var/channel_title = sanitizeSafe(input(user,"Enter channel name or leave blank to cancel:"), 64)
 		if(!channel_title)
 			return
 		var/datum/ntnet_conversation/C = new/datum/ntnet_conversation()
@@ -95,7 +96,7 @@
 	if(href_list["PRG_changename"])
 		. = 1
 		var/mob/living/user = usr
-		var/newname = rustoutf(cp1251_to_utf8(sanitize(input(user,"Enter new nickname or leave blank to cancel:"))))
+		var/newname = sanitize(input(user,"Enter new nickname or leave blank to cancel:"), 20)
 		if(!newname)
 			return 1
 		if(channel)
@@ -107,7 +108,7 @@
 		if(!channel)
 			return
 		var/mob/living/user = usr
-		var/logname = rustoutf(cp1251_to_utf8(sanitize(input(user,"Enter desired logfile name (.log) or leave blank to cancel:"))))
+		var/logname = input(user,"Enter desired logfile name (.log) or leave blank to cancel:")
 		if(!logname || !channel)
 			return 1
 		var/datum/computer_file/data/logfile = new/datum/computer_file/data/logfile()
@@ -132,11 +133,11 @@
 		if(!operator_mode || !channel)
 			return 1
 		var/mob/living/user = usr
-		var/newname = cp1251_to_utf8(sanitize(input(user, "Enter new channel name or leave blank to cancel:")))
+		var/newname = sanitize(input(user, "Enter new channel name or leave blank to cancel:"), 64)
 		if(!newname || !channel)
 			return
 		channel.add_status_message("Channel renamed from [channel.title] to [newname] by operator.")
-		channel.title = rustoutf(newname)
+		channel.title = newname
 	if(href_list["PRG_deletechannel"])
 		. = 1
 		if(channel && ((channel.operator == src) || netadmin_mode))
@@ -181,7 +182,7 @@
 /datum/nano_module/program/computer_chatclient
 	name = "NTNet Relay Chat Client"
 
-/datum/nano_module/program/computer_chatclient/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = default_state)
+/datum/nano_module/program/computer_chatclient/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)
 	if(!ntnet_global || !ntnet_global.chat_channels)
 		return
 
@@ -221,7 +222,7 @@
 				)))
 		data["all_channels"] = all_channels
 
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "ntnet_chat.tmpl", "NTNet Relay Chat Client", 575, 700, state = state)
 		ui.auto_update_layout = 1

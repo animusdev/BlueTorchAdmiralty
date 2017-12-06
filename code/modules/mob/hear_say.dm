@@ -4,7 +4,7 @@
 	if(!client)
 		return
 
-	if(speaker && !speaker.client && isghost(src) && is_preference_enabled(/datum/client_preference/ghost_ears) && !(speaker in view(src)))
+	if(speaker && !speaker.client && isghost(src) && get_preference_value(/datum/client_preference/ghost_ears) == GLOB.PREF_ALL_SPEECH && !(speaker in view(src)))
 			//Does the speaker have a client?  It's either random stuff that observers won't care about (Experiment 97B says, 'EHEHEHEHEHEHEHE')
 			//Or someone snoring.  So we make it where they won't hear it.
 		return
@@ -21,7 +21,7 @@
 			italics = 1
 			sound_vol *= 0.5 //muffle the sound a bit, so it's like we're actually talking through contact
 
-	if(sleeping || stat == 1)
+	if(sleeping || stat == UNCONSCIOUS)
 		hear_sleep(message)
 		return
 
@@ -50,14 +50,14 @@
 		speaker_name = H.GetVoice()
 
 	if(italics)
-		message = "<i>[intonation(message)]</i>"
+		message = "<i>[message]</i>"
 
 	var/track = null
 	if(isghost(src))
 		if(speaker_name != speaker.real_name && speaker.real_name)
 			speaker_name = "[speaker.real_name] ([speaker_name])"
 		track = "([ghost_follow_link(speaker, src)]) "
-		if(is_preference_enabled(/datum/client_preference/ghost_ears) && (speaker in view(src)))
+		if(get_preference_value(/datum/client_preference/ghost_ears) == GLOB.PREF_ALL_SPEECH && (speaker in view(src)))
 			message = "<b>[message]</b>"
 
 	if(is_deaf())
@@ -118,10 +118,7 @@
 			else // Used for compression
 				message = RadioChat(null, message, 80, 1+(hard_to_hear/10))
 
-	var/speaker_name = speaker.name
-
-	if(vname)
-		speaker_name = vname
+	var/speaker_name = vname ? vname : speaker.name
 
 	if(istype(speaker, /mob/living/carbon/human))
 		var/mob/living/carbon/human/H = speaker
@@ -140,13 +137,13 @@
 		if (ishuman(speaker))
 			var/mob/living/carbon/human/H = speaker
 
-			if(H.wear_mask && istype(H.wear_mask,/obj/item/clothing/mask/gas/voice))
+			if(H.wear_mask && istype(H.wear_mask,/obj/item/clothing/mask/chameleon/voice))
 				changed_voice = 1
 				var/list/impersonated = new()
 				var/mob/living/carbon/human/I = impersonated[speaker_name]
 
 				if(!I)
-					for(var/mob/living/carbon/human/M in mob_list)
+					for(var/mob/living/carbon/human/M in SSmobs.mob_list)
 						if(M.real_name == speaker_name)
 							I = M
 							impersonated[speaker_name] = I
@@ -192,7 +189,8 @@
 	else
 		formatted = "[verb], <span class=\"body\">\"[message]\"</span>"
 	if(sdisabilities & DEAF || ear_deaf)
-		if(prob(20))
+		var/mob/living/carbon/human/H = src
+		if(istype(H) && H.has_headset_in_ears() && prob(20))
 			to_chat(src, "<span class='warning'>You feel your headset vibrate but can hear nothing from it!</span>")
 	else
 		on_hear_radio(part_a, speaker_name, track, part_b, part_c, formatted)
@@ -217,6 +215,9 @@
 /mob/proc/hear_signlang(var/message, var/verb = "gestures", var/datum/language/language, var/mob/speaker = null)
 	if(!client)
 		return
+
+	if(sleeping || stat == UNCONSCIOUS)
+		return 0
 
 	if(say_understands(speaker, language))
 		message = "<B>[speaker]</B> [verb], \"[message]\""

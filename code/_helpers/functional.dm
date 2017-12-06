@@ -35,7 +35,7 @@
 		to_chat(feedback_receiver, "<span class='warning'>Value must be a numeral.</span>")
 
 /proc/is_dir_predicate(var/value, var/feedback_receiver)
-	. = (value in alldirs)
+	. = (value in GLOB.alldirs)
 	if(!. && feedback_receiver)
 		to_chat(feedback_receiver, "<span class='warning'>Value must be a direction.</span>")
 
@@ -57,3 +57,8 @@
 
 		if(all_predicates_true(predicate_input, predicates))
 			. += entry
+
+/proc/map(var/list/list_to_map, var/map_proc)
+	. = list()
+	for(var/entry in list_to_map)
+		. += call(map_proc)(entry)

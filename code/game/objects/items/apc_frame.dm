@@ -9,7 +9,7 @@
 
 /obj/item/frame/apc/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	..()
-	if (istype(W, /obj/item/weapon/wrench))
+	if(isWrench(W))
 		new /obj/item/stack/material/steel( get_turf(src.loc), 2 )
 		qdel(src)
 
@@ -17,7 +17,7 @@
 	if (get_dist(on_wall,usr)>1)
 		return
 	var/ndir = get_dir(usr,on_wall)
-	if (!(ndir in cardinal))
+	if (!(ndir in GLOB.cardinal))
 		return
 	var/turf/loc = get_turf(usr)
 	var/area/A = loc.loc

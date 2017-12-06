@@ -1,10 +1,39 @@
-/mob/living/carbon/human/say(var/message)
+/mob/living/carbon/human/say(var/message, var/datum/language/speaking = null, whispering)
 	var/alt_name = ""
 	if(name != GetVoice())
-		alt_name = "(as [get_id_name("Unknown")])"
+		if(get_id_name("Unknown") != GetVoice())
+			alt_name = "(as [get_id_name("Unknown")])"
+		else
+			name = get_id_name("Unknown")
+
+	//parse the language code and consume it
+	if(!speaking)
+		speaking = parse_language(message)
+		if (speaking)
+			message = copytext(message,2+length(speaking.key))
+		else 
+			speaking = get_default_language()
 
 	message = sanitize(message)
-	..(message, alt_name = alt_name)
+	var/obj/item/organ/internal/voicebox/vox = locate() in internal_organs
+	var/snowflake_speak = (speaking && (speaking.flags & NONVERBAL|SIGNLANG)) || (vox && vox.is_usable() && (speaking in vox.assists_languages))
+	if(!isSynthetic() && need_breathe() && failed_last_breath && !snowflake_speak)
+		var/obj/item/organ/internal/lungs/L = internal_organs_by_name[species.breathing_organ]
+		if(L.breath_fail_ratio > 0.9)
+			if(world.time < L.last_failed_breath + 2 MINUTES) //if we're in grace suffocation period, give it up for last words
+				to_chat(src, "<span class='warning'>You use your remaining air to say something!</span>")
+				L.last_failed_breath = world.time - 2 MINUTES
+				return ..(message, alt_name = alt_name, speaking = speaking)
+
+			to_chat(src, "<span class='warning'>You don't have enough air in [L] to make a sound!</span>")
+			return
+		else if(L.breath_fail_ratio > 0.7)
+			whisper_say(length(message) > 5 ? stars(message) : message, speaking, alt_name)
+		else if(L.breath_fail_ratio > 0.4 && length(message) > 10)
+			whisper_say(message, speaking, alt_name)
+	else
+		return ..(message, alt_name = alt_name, speaking = speaking, whispering = whispering)
+
 
 /mob/living/carbon/human/proc/forcesay(list/append)
 	if(stat == CONSCIOUS)
@@ -191,3 +220,33 @@
 		returns[2] = 50
 		return returns
 	return ..()
+
+/mob/living/carbon/human/can_speak(datum/language/speaking)
+	var/needs_assist = 0
+	var/can_speak_assist = 0
+
+	if(species && speaking.name in species.assisted_langs)
+		needs_assist = 1
+		for(var/obj/item/organ/internal/I in src.internal_organs)
+			if((speaking in I.assists_languages) && (I.is_usable()))
+				can_speak_assist = 1
+
+	if(needs_assist && !can_speak_assist)
+		return 0
+	else if(needs_assist && can_speak_assist)
+		return 1
+
+	return ..()
+
+/mob/living/carbon/human/parse_language(var/message)
+	var/prefix = copytext(message,1,2)
+	if(length(message) >= 1 && prefix == "!")
+		return all_languages["Noise"]
+
+	if(length(message) >= 2 && is_language_prefix(prefix))
+		var/language_prefix = lowertext(copytext(message, 2 ,3))
+		var/datum/language/L = language_keys[language_prefix]
+		if (can_speak(L))
+			return L
+
+	return null

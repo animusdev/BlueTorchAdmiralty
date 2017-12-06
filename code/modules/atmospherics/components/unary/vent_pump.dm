@@ -64,8 +64,8 @@
 	icon_state = "map_vent_in"
 	external_pressure_bound = 0
 	external_pressure_bound_default = 0
-	internal_pressure_bound = 2000
-	internal_pressure_bound_default = 2000
+	internal_pressure_bound = MAX_PUMP_PRESSURE
+	internal_pressure_bound_default = MAX_PUMP_PRESSURE
 	pressure_checks = 2
 	pressure_checks_default = 2
 
@@ -82,7 +82,10 @@
 
 /obj/machinery/atmospherics/unary/vent_pump/Destroy()
 	unregister_radio(src, frequency)
-	..()
+	if(initial_loc)
+		initial_loc.air_vent_info -= id_tag
+		initial_loc.air_vent_names -= id_tag
+	. = ..()
 
 /obj/machinery/atmospherics/unary/vent_pump/high_volume
 	name = "Large Air Vent"
@@ -155,7 +158,7 @@
 		return 0
 	return 1
 
-/obj/machinery/atmospherics/unary/vent_pump/process()
+/obj/machinery/atmospherics/unary/vent_pump/Process()
 	..()
 
 	if (hibernate > world.time)
@@ -251,8 +254,8 @@
 	return 1
 
 
-/obj/machinery/atmospherics/unary/vent_pump/initialize()
-	..()
+/obj/machinery/atmospherics/unary/vent_pump/Initialize()
+	. = ..()
 
 	//some vents work his own special way
 	radio_filter_in = frequency==1439?(RADIO_FROM_AIRALARM):null
@@ -349,7 +352,7 @@
 	return
 
 /obj/machinery/atmospherics/unary/vent_pump/attackby(obj/item/W, mob/user)
-	if(istype(W, /obj/item/weapon/weldingtool))
+	if(isWelder(W))
 
 		var/obj/item/weapon/weldingtool/WT = W
 
@@ -394,7 +397,7 @@
 		to_chat(user, "It seems welded shut.")
 
 /obj/machinery/atmospherics/unary/vent_pump/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
-	if (!istype(W, /obj/item/weapon/wrench))
+	if(!isWrench(W))
 		return ..()
 	if (!(stat & NOPOWER) && use_power)
 		to_chat(user, "<span class='warning'>You cannot unwrench \the [src], turn it off first.</span>")
@@ -418,13 +421,6 @@
 			"You hear a ratchet.")
 		new /obj/item/pipe(loc, make_from=src)
 		qdel(src)
-
-/obj/machinery/atmospherics/unary/vent_pump/Destroy()
-	if(initial_loc)
-		initial_loc.air_vent_info -= id_tag
-		initial_loc.air_vent_names -= id_tag
-	..()
-	return
 
 #undef DEFAULT_PRESSURE_DELTA
 

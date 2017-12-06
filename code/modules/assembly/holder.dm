@@ -144,7 +144,7 @@
 
 
 	attackby(obj/item/weapon/W as obj, mob/user as mob)
-		if(isscrewdriver(W))
+		if(isScrewdriver(W))
 			if(!a_left || !a_right)
 				to_chat(user, "<span class='warning'>BUG:Assembly part missing, please report this!</span>")
 				return
@@ -213,10 +213,10 @@
 
 /obj/item/device/assembly_holder/New()
 	..()
-	listening_objects += src
+	GLOB.listening_objects += src
 
 /obj/item/device/assembly_holder/Destroy()
-	listening_objects -= src
+	GLOB.listening_objects -= src
 	return ..()
 
 
@@ -242,7 +242,7 @@
 		tmr.time=5
 		tmr.secured = 1
 		tmr.holder = src
-		processing_objects.Add(tmr)
+		START_PROCESSING(SSobj, tmr)
 		a_left = tmr
 		a_right = ign
 		secured = 1

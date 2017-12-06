@@ -15,15 +15,15 @@
 		explosion_resistance = reinf_material.explosion_resistance
 
 	if(reinf_material)
-		name = "reinforced [material.display_name] wall"
+		name = "reinforced [material.display_name] [initial(name)]"
 		desc = "It seems to be a section of hull reinforced with [reinf_material.display_name] and plated with [material.display_name]."
 	else
-		name = "[material.display_name] wall"
+		name = "[material.display_name] [initial(name)]"
 		desc = "It seems to be a section of hull plated with [material.display_name]."
 
 	set_opacity(material.opacity >= 0.5)
 
-	calc_rad_resistance()
+	radiation_repository.resistance_cache.Remove(src)
 	update_connections(1)
 	update_icon()
 

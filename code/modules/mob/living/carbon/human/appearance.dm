@@ -1,4 +1,4 @@
-/mob/living/carbon/human/proc/change_appearance(var/flags = APPEARANCE_ALL_HAIR, var/location = src, var/mob/user = src, var/check_species_whitelist = 1, var/list/species_whitelist = list(), var/list/species_blacklist = list(), var/datum/topic_state/state = default_state)
+/mob/living/carbon/human/proc/change_appearance(var/flags = APPEARANCE_ALL_HAIR, var/location = src, var/mob/user = src, var/check_species_whitelist = 1, var/list/species_whitelist = list(), var/list/species_blacklist = list(), var/datum/topic_state/state = GLOB.default_state)
 	var/datum/nano_module/appearance_changer/AC = new(location, src, check_species_whitelist, species_whitelist, species_blacklist)
 	AC.flags = flags
 	AC.ui_interact(user, state = state)
@@ -124,7 +124,7 @@
 	return 1
 
 /mob/living/carbon/human/proc/change_skin_tone(var/tone)
-	if(s_tone == tone || !(species.appearance_flags & HAS_SKIN_TONE))
+	if(s_tone == tone || !(species.appearance_flags & HAS_A_SKIN_TONE))
 		return
 
 	s_tone = tone

@@ -63,11 +63,11 @@
 	return parent.return_network(reference)
 
 /obj/machinery/atmospherics/pipe/Destroy()
-	qdel(parent)
+	QDEL_NULL(parent)
 	if(air_temporary)
 		loc.assume_air(air_temporary)
 
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
 	if (istype(src, /obj/machinery/atmospherics/pipe/tank))
@@ -78,7 +78,7 @@
 	if(istype(W,/obj/item/device/pipe_painter))
 		return 0
 
-	if (!istype(W, /obj/item/weapon/wrench))
+	if(!isWrench(W))
 		return ..()
 	var/turf/T = src.loc
 	if (level==1 && isturf(T) && !T.is_plating())
@@ -186,10 +186,10 @@
 
 /obj/machinery/atmospherics/pipe/simple/hide(var/i)
 	if(istype(loc, /turf/simulated))
-		invisibility = i ? 101 : 0
+		set_invisibility(i ? 101 : 0)
 	update_icon()
 
-/obj/machinery/atmospherics/pipe/simple/process()
+/obj/machinery/atmospherics/pipe/simple/Process()
 	if(!parent) //This should cut back on the overhead calling build_network thousands of times per cycle
 		..()
 	else if(leaking)
@@ -235,10 +235,12 @@
 /obj/machinery/atmospherics/pipe/simple/Destroy()
 	if(node1)
 		node1.disconnect(src)
+		node1 = null
 	if(node2)
 		node2.disconnect(src)
+		node1 = null
 
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/simple/pipeline_expansion()
 	return list(node1, node2)
@@ -252,6 +254,8 @@
 		node2.update_underlays()
 
 /obj/machinery/atmospherics/pipe/simple/update_icon(var/safety = 0)
+	if(!atmos_initalized)
+		return
 	if(!check_icon_cache())
 		return
 
@@ -275,17 +279,18 @@
 		overlays += icon_manager.get_atmos_icon("pipe", , pipe_color, "[pipe_icon]exposed[node1?1:0][node2?1:0][icon_connect_type]")
 		if(!leaking)
 			leaking = 1
-			processing_objects |= src
+			START_PROCESSING(SSmachines, src)
 
 /obj/machinery/atmospherics/pipe/simple/update_underlays()
 	return
 
-/obj/machinery/atmospherics/pipe/simple/initialize()
+/obj/machinery/atmospherics/pipe/simple/atmos_init()
+	..()
 	normalize_dir()
 	var/node1_dir
 	var/node2_dir
 
-	for(var/direction in cardinal)
+	for(var/direction in GLOB.cardinal)
 		if(direction&initialize_directions)
 			if (!node1_dir)
 				node1_dir = direction
@@ -449,13 +454,13 @@
 
 /obj/machinery/atmospherics/pipe/manifold/hide(var/i)
 	if(istype(loc, /turf/simulated))
-		invisibility = i ? 101 : 0
+		set_invisibility(i ? 101 : 0)
 	update_icon()
 
 /obj/machinery/atmospherics/pipe/manifold/pipeline_expansion()
 	return list(node1, node2, node3)
 
-/obj/machinery/atmospherics/pipe/manifold/process()
+/obj/machinery/atmospherics/pipe/manifold/Process()
 	if(!parent)
 		..()
 	else
@@ -464,12 +469,15 @@
 /obj/machinery/atmospherics/pipe/manifold/Destroy()
 	if(node1)
 		node1.disconnect(src)
+		node1 = null
 	if(node2)
 		node2.disconnect(src)
+		node2 = null
 	if(node3)
 		node3.disconnect(src)
+		node3 = null
 
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/manifold/disconnect(obj/machinery/atmospherics/reference)
 	if(reference == node1)
@@ -502,6 +510,8 @@
 		node3.update_underlays()
 
 /obj/machinery/atmospherics/pipe/manifold/update_icon(var/safety = 0)
+	if(!atmos_initalized)
+		return
 	if(!check_icon_cache())
 		return
 
@@ -541,10 +551,11 @@
 	..()
 	update_icon()
 
-/obj/machinery/atmospherics/pipe/manifold/initialize()
+/obj/machinery/atmospherics/pipe/manifold/atmos_init()
+	..()
 	var/connect_directions = (NORTH|SOUTH|EAST|WEST)&(~dir)
 
-	for(var/direction in cardinal)
+	for(var/direction in GLOB.cardinal)
 		if(direction&connect_directions)
 			for(var/obj/machinery/atmospherics/target in get_step(src,direction))
 				if(target.initialize_directions & get_dir(target,src))
@@ -556,7 +567,7 @@
 				break
 
 
-	for(var/direction in cardinal)
+	for(var/direction in GLOB.cardinal)
 		if(direction&connect_directions)
 			for(var/obj/machinery/atmospherics/target in get_step(src,direction))
 				if(target.initialize_directions & get_dir(target,src))
@@ -568,7 +579,7 @@
 				break
 
 
-	for(var/direction in cardinal)
+	for(var/direction in GLOB.cardinal)
 		if(direction&connect_directions)
 			for(var/obj/machinery/atmospherics/target in get_step(src,direction))
 				if(target.initialize_directions & get_dir(target,src))
@@ -697,7 +708,7 @@
 /obj/machinery/atmospherics/pipe/manifold4w/pipeline_expansion()
 	return list(node1, node2, node3, node4)
 
-/obj/machinery/atmospherics/pipe/manifold4w/process()
+/obj/machinery/atmospherics/pipe/manifold4w/Process()
 	if(!parent)
 		..()
 	else
@@ -706,14 +717,18 @@
 /obj/machinery/atmospherics/pipe/manifold4w/Destroy()
 	if(node1)
 		node1.disconnect(src)
+		node1 = null
 	if(node2)
 		node2.disconnect(src)
+		node2 = null
 	if(node3)
 		node3.disconnect(src)
+		node3 = null
 	if(node4)
 		node4.disconnect(src)
+		node4 = null
 
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/manifold4w/disconnect(obj/machinery/atmospherics/reference)
 	if(reference == node1)
@@ -753,6 +768,8 @@
 		node4.update_underlays()
 
 /obj/machinery/atmospherics/pipe/manifold4w/update_icon(var/safety = 0)
+	if(!atmos_initalized)
+		return
 	if(!check_icon_cache())
 		return
 
@@ -809,11 +826,11 @@
 
 /obj/machinery/atmospherics/pipe/manifold4w/hide(var/i)
 	if(istype(loc, /turf/simulated))
-		invisibility = i ? 101 : 0
+		set_invisibility(i ? 101 : 0)
 	update_icon()
 
-/obj/machinery/atmospherics/pipe/manifold4w/initialize()
-
+/obj/machinery/atmospherics/pipe/manifold4w/atmos_init()
+	..()
 	for(var/obj/machinery/atmospherics/target in get_step(src,1))
 		if(target.initialize_directions & 2)
 			if (check_connect_types(target,src))
@@ -952,13 +969,13 @@
 
 /obj/machinery/atmospherics/pipe/cap/hide(var/i)
 	if(istype(loc, /turf/simulated))
-		invisibility = i ? 101 : 0
+		set_invisibility(i ? 101 : 0)
 	update_icon()
 
 /obj/machinery/atmospherics/pipe/cap/pipeline_expansion()
 	return list(node)
 
-/obj/machinery/atmospherics/pipe/cap/process()
+/obj/machinery/atmospherics/pipe/cap/Process()
 	if(!parent)
 		..()
 	else
@@ -967,7 +984,7 @@
 	if(node)
 		node.disconnect(src)
 
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/cap/disconnect(obj/machinery/atmospherics/reference)
 	if(reference == node)
@@ -994,7 +1011,8 @@
 	overlays.Cut()
 	overlays += icon_manager.get_atmos_icon("pipe", , pipe_color, "cap")
 
-/obj/machinery/atmospherics/pipe/cap/initialize()
+/obj/machinery/atmospherics/pipe/cap/atmos_init()
+	..()
 	for(var/obj/machinery/atmospherics/target in get_step(src, dir))
 		if(target.initialize_directions & get_dir(target,src))
 			if (check_connect_types(target,src))
@@ -1078,7 +1096,7 @@
 	initialize_directions = dir
 	..()
 
-/obj/machinery/atmospherics/pipe/tank/process()
+/obj/machinery/atmospherics/pipe/tank/Process()
 	if(!parent)
 		..()
 	else
@@ -1088,7 +1106,7 @@
 	if(node1)
 		node1.disconnect(src)
 
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/tank/pipeline_expansion()
 	return list(node1)
@@ -1104,7 +1122,8 @@
 /obj/machinery/atmospherics/pipe/tank/hide()
 	update_underlays()
 
-/obj/machinery/atmospherics/pipe/tank/initialize()
+/obj/machinery/atmospherics/pipe/tank/atmos_init()
+	..()
 	var/connect_direction = dir
 
 	for(var/obj/machinery/atmospherics/target in get_step(src,connect_direction))
@@ -1129,9 +1148,8 @@
 	if(istype(W, /obj/item/device/pipe_painter))
 		return
 
-	if(istype(W, /obj/item/device/analyzer) && in_range(user, src))
-		var/obj/item/device/analyzer/A = W
-		A.analyze_gases(src, user)
+	if(istype(W, /obj/item/device/analyzer))
+		return
 
 /obj/machinery/atmospherics/pipe/tank/air
 	name = "Pressure Tank (Air)"
@@ -1243,7 +1261,7 @@
 	name = "Larger vent"
 	volume = 1000
 
-/obj/machinery/atmospherics/pipe/vent/process()
+/obj/machinery/atmospherics/pipe/vent/Process()
 	if(!parent)
 		if(build_killswitch <= 0)
 			. = PROCESS_KILL
@@ -1258,7 +1276,7 @@
 	if(node1)
 		node1.disconnect(src)
 
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/vent/pipeline_expansion()
 	return list(node1)
@@ -1272,7 +1290,8 @@
 	else
 		icon_state = "exposed"
 
-/obj/machinery/atmospherics/pipe/vent/initialize()
+/obj/machinery/atmospherics/pipe/vent/atmos_init()
+	..()
 	var/connect_direction = dir
 
 	for(var/obj/machinery/atmospherics/target in get_step(src,connect_direction))

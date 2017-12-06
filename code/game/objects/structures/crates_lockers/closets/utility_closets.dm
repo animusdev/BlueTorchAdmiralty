@@ -86,8 +86,6 @@
 
 /obj/structure/closet/firecloset/full/New()
 	..()
-	sleep(4)
-	contents = list()
 
 	new /obj/item/clothing/suit/fire/firefighter(src)
 	new /obj/item/clothing/mask/gas(src)
@@ -210,9 +208,12 @@
 	anchored = 1
 	density = 0
 	wall_mounted = 1
+	storage_types = CLOSET_STORAGE_ITEMS
 
 /obj/structure/closet/hydrant/New()
 	..()
+	new /obj/item/inflatable/door(src)
+	new /obj/item/inflatable/door(src)
 	new /obj/item/clothing/suit/fire/firefighter(src)
 	new /obj/item/clothing/mask/gas/half(src)
 	new /obj/item/device/flashlight(src)
@@ -225,13 +226,14 @@
  */
 /obj/structure/closet/medical_wall //wall mounted medical closet
 	name = "first-aid closet"
-	desc = "It's wall-mounted storage unit for first aid supplies."
+	desc = "It's a wall-mounted storage unit for first aid supplies."
 	icon_state = "medical_wall"
 	icon_closed = "medical_wall"
 	icon_opened = "medical_wall_open"
 	anchored = 1
 	density = 0
 	wall_mounted = 1
+	storage_types = CLOSET_STORAGE_ITEMS
 
 /obj/structure/closet/medical_wall/update_icon()
 	if(!opened)
@@ -240,10 +242,33 @@
 		icon_state = icon_opened
 
 /obj/structure/closet/medical_wall/filled
-	name = "first-aid closet"
-	desc = "It's wall-mounted storage unit for first aid supplies."
 
-	will_contain = list(
+/obj/structure/closet/medical_wall/filled/WillContain()
+	return list(
 		/obj/random/firstaid,
-		/obj/random/medical/lite = 12
-	)
+		/obj/random/medical/lite = 12)
+
+/obj/structure/closet/shipping_wall
+	name = "shipping supplies closet"
+	desc = "It's a wall-mounted storage unit containing supplies for preparing shipments."
+	icon_state = "shipping_wall"
+	icon_closed = "shipping_wall"
+	icon_opened = "shipping_wall_open"
+	anchored = 1
+	density = 0
+	wall_mounted = 1
+	storage_types = CLOSET_STORAGE_ITEMS
+
+/obj/structure/closet/shipping_wall/update_icon()
+	if(!opened)
+		icon_state = icon_closed
+	else
+		icon_state = icon_opened
+
+/obj/structure/closet/shipping_wall/filled
+
+/obj/structure/closet/shipping_wall/filled/WillContain()
+	return list(
+		/obj/item/stack/material/cardboard/ten,
+		/obj/item/device/destTagger,
+		/obj/item/weapon/packageWrap)

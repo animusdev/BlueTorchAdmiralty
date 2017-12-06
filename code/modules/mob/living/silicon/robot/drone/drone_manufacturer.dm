@@ -38,7 +38,7 @@
 	if (stat & NOPOWER)
 		icon_state = "drone_fab_nopower"
 
-/obj/machinery/drone_fabricator/process()
+/obj/machinery/drone_fabricator/Process()
 
 	if(ticker.current_state < GAME_STATE_PLAYING)
 		return
@@ -71,19 +71,20 @@
 	if(!produce_drones || !config.allow_drone_spawn || count_drones() >= config.max_maint_drones)
 		return
 
-	if(!player || !isghost(player.mob))
+	if(player && !isghost(player.mob))
 		return
 
-	announce_ghost_joinleave(player, 0, "They have taken control over a maintenance drone.")
 	visible_message("\The [src] churns and grinds as it lurches into motion, disgorging a shiny new drone after a few moments.")
 	flick("h_lathe_leave",src)
-
-	time_last_drone = world.time
-	if(player.mob && player.mob.mind) player.mob.mind.reset()
-	var/mob/living/silicon/robot/drone/new_drone = new drone_type(get_turf(src))
-	new_drone.transfer_personality(player)
-
 	drone_progress = 0
+	time_last_drone = world.time
+
+	var/mob/living/silicon/robot/drone/new_drone = new drone_type(get_turf(src))
+	if(player)
+		announce_ghost_joinleave(player, 0, "They have taken control over a maintenance drone.")
+		if(player.mob && player.mob.mind) player.mob.mind.reset()
+		new_drone.transfer_personality(player)
+
 	return new_drone
 
 /mob/observer/ghost/verb/join_as_drone()
@@ -106,13 +107,18 @@
 		to_chat(user, "<span class='danger'>You are banned from playing synthetics and cannot spawn as a drone.</span>")
 		return
 
+	if(config.use_age_restriction_for_jobs && isnum(user.client.player_age))
+		if(user.client.player_age <= 3)
+			to_chat(user, "<span class='danger'> Your account is not old enough to play as a maintenance drone.</span>")
+			return
+
 	if(!user.MayRespawn(1, DRONE_SPAWN_DELAY))
 		return
 
 	if(!fabricator)
 
 		var/list/all_fabricators = list()
-		for(var/obj/machinery/drone_fabricator/DF in machines)
+		for(var/obj/machinery/drone_fabricator/DF in SSmachines.machinery)
 			if((DF.stat & NOPOWER) || !DF.produce_drones || DF.drone_progress < 100)
 				continue
 			all_fabricators[DF.fabricator_tag] = DF
@@ -127,6 +133,7 @@
 		fabricator = all_fabricators[choice]
 
 	if(user && fabricator && !((fabricator.stat & NOPOWER) || !fabricator.produce_drones || fabricator.drone_progress < 100))
+		log_and_message_admins("has joined the round as a maintenance drone.")
 		var/mob/drone = fabricator.create_drone(user.client)
 		if(drone)
 			drone.status_flags |= NO_ANTAG

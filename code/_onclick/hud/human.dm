@@ -1,7 +1,8 @@
-/mob/living/carbon/human/instantiate_hud(var/datum/hud/HUD, var/ui_style, var/ui_color, var/ui_alpha)
-	HUD.human_hud(ui_style, ui_color, ui_alpha, src)
+/mob/living/carbon/human
+	hud_type = /datum/hud/human
 
-/datum/hud/proc/human_hud(var/ui_style='icons/mob/screen1_White.dmi', var/ui_color = "#ffffff", var/ui_alpha = 255, var/mob/living/carbon/human/target)
+/datum/hud/human/FinalizeInstantiation(var/ui_style='icons/mob/screen1_White.dmi', var/ui_color = "#ffffff", var/ui_alpha = 255)
+	var/mob/living/carbon/human/target = mymob
 	var/datum/hud_data/hud_data
 	if(!istype(target))
 		hud_data = new()
@@ -56,65 +57,11 @@
 	// Draw the attack intent dialogue.
 	if(hud_data.has_a_intent)
 
-		using = new /obj/screen()
-		using.name = "act_intent"
-		using.icon = ui_style
-		using.icon_state = "intent_"+mymob.a_intent
-		using.screen_loc = ui_acti
-		using.color = ui_color
-		using.alpha = ui_alpha
+		using = new /obj/screen/intent()
 		src.adding += using
 		action_intent = using
 
 		hud_elements |= using
-
-		//intent small hud objects
-		var/icon/ico
-
-		ico = new(ui_style, "black")
-		ico.MapColors(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, -1,-1,-1,-1)
-		ico.DrawBox(rgb(255,255,255,1),1,ico.Height()/2,ico.Width()/2,ico.Height())
-		using = new /obj/screen( src )
-		using.name = I_HELP
-		using.icon = ico
-		using.screen_loc = ui_acti
-		using.alpha = ui_alpha
-		src.adding += using
-		help_intent = using
-
-		ico = new(ui_style, "black")
-		ico.MapColors(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, -1,-1,-1,-1)
-		ico.DrawBox(rgb(255,255,255,1),ico.Width()/2,ico.Height()/2,ico.Width(),ico.Height())
-		using = new /obj/screen( src )
-		using.name = I_DISARM
-		using.icon = ico
-		using.screen_loc = ui_acti
-		using.alpha = ui_alpha
-		src.adding += using
-		disarm_intent = using
-
-		ico = new(ui_style, "black")
-		ico.MapColors(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, -1,-1,-1,-1)
-		ico.DrawBox(rgb(255,255,255,1),ico.Width()/2,1,ico.Width(),ico.Height()/2)
-		using = new /obj/screen( src )
-		using.name = I_GRAB
-		using.icon = ico
-		using.screen_loc = ui_acti
-		using.alpha = ui_alpha
-		src.adding += using
-		grab_intent = using
-
-		ico = new(ui_style, "black")
-		ico.MapColors(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, -1,-1,-1,-1)
-		ico.DrawBox(rgb(255,255,255,1),1,1,ico.Width()/2,ico.Height()/2)
-		using = new /obj/screen( src )
-		using.name = I_HURT
-		using.icon = ico
-		using.screen_loc = ui_acti
-		using.alpha = ui_alpha
-		src.adding += using
-		hurt_intent = using
-		//end intent small hud objects
 
 	if(hud_data.has_m_intent)
 		using = new /obj/screen()
@@ -275,13 +222,22 @@
 		mymob.bodytemp.screen_loc = ui_temp
 		hud_elements |= mymob.bodytemp
 
-	if(hud_data.has_nutrition)
+	if(target.isSynthetic())
+		target.cells = new /obj/screen()
+		target.cells.icon = 'icons/mob/screen1_robot.dmi'
+		target.cells.icon_state = "charge-empty"
+		target.cells.name = "cell"
+		target.cells.screen_loc = ui_nutrition
+		hud_elements |= target.cells
+
+	else if(hud_data.has_nutrition)
 		mymob.nutrition_icon = new /obj/screen()
 		mymob.nutrition_icon.icon = ui_style
 		mymob.nutrition_icon.icon_state = "nutrition0"
 		mymob.nutrition_icon.name = "nutrition"
 		mymob.nutrition_icon.screen_loc = ui_nutrition
 		hud_elements |= mymob.nutrition_icon
+
 
 	mymob.pain = new /obj/screen( null )
 
@@ -332,11 +288,3 @@
 	else
 		client.screen -= hud_used.hotkeybuttons
 		hud_used.hotkey_ui_hidden = 1
-
-//Used for new human mobs created by cloning/goleming/etc.
-/mob/living/carbon/human/proc/set_cloned_appearance()
-	f_style = "Shaved"
-	if(dna.species == SPECIES_HUMAN) //no more xenos losing ears/tentacles
-		h_style = pick("Bedhead", "Bedhead 2", "Bedhead 3")
-	all_underwear.Cut()
-	regenerate_icons()

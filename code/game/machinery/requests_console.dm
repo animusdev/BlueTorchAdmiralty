@@ -120,7 +120,7 @@ var/list/obj/machinery/requests_console/allConsoles = list()
 	data["msgVerified"] = msgVerified
 	data["announceAuth"] = announceAuth
 
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "request_console.tmpl", "[department] Request Console", 520, 410)
 		ui.set_initial_data(data)
@@ -134,7 +134,7 @@ var/list/obj/machinery/requests_console/allConsoles = list()
 	if(reject_bad_text(href_list["write"]))
 		recipient = href_list["write"] //write contains the string of the receiving department's name
 
-		var/new_message = cp1251_to_utf8(sanitize(input_utf8("Write your message:", "Awaiting Input", "")))
+		var/new_message = sanitize(input("Write your message:", "Awaiting Input", ""))
 		if(new_message)
 			message = new_message
 			screen = RCS_MESSAUTH
@@ -146,7 +146,7 @@ var/list/obj/machinery/requests_console/allConsoles = list()
 			reset_message(1)
 
 	if(href_list["writeAnnouncement"])
-		var/new_message = cp1251_to_utf8(sanitize(input_utf8("Write your message:", "Awaiting Input", "")))
+		var/new_message = sanitize(input("Write your message:", "Awaiting Input", ""))
 		if(new_message)
 			message = new_message
 		else
@@ -154,7 +154,7 @@ var/list/obj/machinery/requests_console/allConsoles = list()
 
 	if(href_list["sendAnnouncement"])
 		if(!announcementConsole)	return
-		announcement.Announce(utf8_to_cp1251(message), msg_sanitized = 1)
+		announcement.Announce(message, msg_sanitized = 1)
 		reset_message(1)
 
 	if( href_list["department"] && message )

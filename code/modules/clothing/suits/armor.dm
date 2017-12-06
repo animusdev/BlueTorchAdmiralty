@@ -1,6 +1,6 @@
 
 /obj/item/clothing/suit/armor
-	allowed = list(/obj/item/weapon/gun/energy,/obj/item/device/radio,/obj/item/weapon/reagent_containers/spray/pepper,/obj/item/weapon/gun/projectile,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/melee/baton,/obj/item/weapon/handcuffs)
+	allowed = list(/obj/item/weapon/gun/energy,/obj/item/device/radio,/obj/item/weapon/reagent_containers/spray/pepper,/obj/item/weapon/gun/projectile,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/melee/baton,/obj/item/weapon/handcuffs,/obj/item/weapon/gun/magnetic)
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO
 	item_flags = THICKMATERIAL
 
@@ -43,6 +43,7 @@
 	name = "riot suit"
 	desc = "A suit of armor with heavy padding to protect against melee attacks. Looks like it might impair movement."
 	icon_state = "riot"
+	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA)
 	//item_state = "swat_suit"
 	w_class = ITEM_SIZE_LARGE
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
@@ -71,6 +72,7 @@
 	desc = "A suit of armor with heavy plates to protect against ballistic projectiles. Looks like it might impair movement."
 	icon_state = "bulletproof"
 	//item_state = "swat_suit"
+	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA)
 	w_class = ITEM_SIZE_LARGE
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	armor = list(melee = 42, bullet = 75, laser = 42, energy = 10, bomb = 25, bio = 0, rad = 0)
@@ -98,6 +100,7 @@
 	desc = "A suit of armor with advanced shielding to protect against energy weapons. Looks like it might impair movement."
 	icon_state = "reflect"
 	//item_state = "swat_suit"
+	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA)
 	w_class = ITEM_SIZE_LARGE
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	armor = list(melee = 35, bullet = 35, laser = 75, energy = 50, bomb = 0, bio = 0, rad = 0)
@@ -149,6 +152,7 @@
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
 	cold_protection = UPPER_TORSO|LOWER_TORSO|ARMS
 	heat_protection = UPPER_TORSO|LOWER_TORSO|ARMS
+	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA)
 
 
 /obj/item/clothing/suit/armor/det_suit
@@ -292,16 +296,12 @@
 	icon_state = "kvest"
 	item_state = "armor"
 	armor = list(melee = 30, bullet = 15, laser = 40, energy = 10, bomb = 25, bio = 0, rad = 0)
+	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA)
 
 /obj/item/clothing/suit/armor/vest/nt
 	name = "\improper NanoTrasen armored vest"
 	desc = "A synthetic armor vest. This one is marked with the crest of NanoTrasen."
 	icon_state = "ntvest"
-
-/obj/item/clothing/suit/armor/vest/solgov
-	name = "\improper Sol Central Government armored vest"
-	desc = "A synthetic armor vest. This one is marked with the crest of the Sol Central Government."
-	icon_state = "solvest"
 
 /obj/item/clothing/suit/armor/vest/detective
 	name = "brown armored vest"
@@ -323,7 +323,8 @@
 	desc = "A synthetic armor vest. This one has added webbing and ballistic plates."
 	icon_state = "webvest"
 	armor = list(melee = 40, bullet = 40, laser = 40, energy = 25, bomb = 30, bio = 0, rad = 0)
-	allowed = list(/obj/item/weapon/gun/energy,/obj/item/device/radio,/obj/item/weapon/reagent_containers/spray/pepper,/obj/item/weapon/gun/projectile,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/melee/baton,/obj/item/weapon/handcuffs)
+	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA)
+	allowed = list(/obj/item/weapon/gun/energy,/obj/item/device/radio,/obj/item/weapon/reagent_containers/spray/pepper,/obj/item/weapon/gun/projectile,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/melee/baton,/obj/item/weapon/handcuffs,/obj/item/weapon/gun/magnetic)
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO
 	item_flags = THICKMATERIAL
 	cold_protection = UPPER_TORSO|LOWER_TORSO
@@ -347,21 +348,6 @@
 	desc = "A synthetic armor vest with COMMANDER printed in gold lettering on the chest. This one has added webbing and ballistic plates."
 	icon_state = "comwebvest"
 
-/obj/item/clothing/suit/storage/vest/solgov
-	name = "\improper Sol Central Government heavy armored vest"
-	desc = "A synthetic armor vest with PEACEKEEPER printed in distinctive blue lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "solwebvest"
-
-/obj/item/clothing/suit/storage/vest/solgov/security
-	name = "master at arms heavy armored vest"
-	desc = "A synthetic armor vest with MASTER AT ARMS printed in silver lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "secwebvest"
-
-/obj/item/clothing/suit/storage/vest/solgov/command
-	name = "command heavy armored vest"
-	desc = "A synthetic armor vest with SOL CENTRAL GOVERNMENT printed in gold lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "comwebvest"
-
 /obj/item/clothing/suit/storage/vest/pcrc
 	name = "contractor heavy armored vest"
 	desc = "A synthetic armor vest with PRIVATE SECURITY printed in cyan lettering on the chest. This one has added webbing and ballistic plates."
@@ -383,6 +369,59 @@
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS //now covers legs with new sprite
 	cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
 	heat_protection = UPPER_TORSO|LOWER_TORSO|LEGS
+
+//Modular plate carriers
+/obj/item/clothing/suit/armor/pcarrier
+	name = "plate carrier"
+	desc = "A lightweight black plate carrier vest. It can be equipped with armor plates, but provides no protection of its own."
+	icon = 'icons/obj/clothing/modular_armor.dmi'
+	item_icons = list(slot_wear_suit_str = 'icons/mob/modular_armor.dmi')
+	icon_state = "pcarrier"
+	valid_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA, ACCESSORY_SLOT_ARMOR_C, ACCESSORY_SLOT_ARMOR_A, ACCESSORY_SLOT_ARMOR_L, ACCESSORY_SLOT_ARMOR_S, ACCESSORY_SLOT_ARMOR_M)
+	restricted_accessory_slots = list(ACCESSORY_SLOT_INSIGNIA, ACCESSORY_SLOT_ARMOR_C, ACCESSORY_SLOT_ARMOR_A, ACCESSORY_SLOT_ARMOR_L, ACCESSORY_SLOT_ARMOR_S)
+	blood_overlay_type = "armor"
+
+/obj/item/clothing/suit/armor/pcarrier/light
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate)
+
+/obj/item/clothing/suit/armor/pcarrier/light/nt
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate, /obj/item/clothing/accessory/armor/tag/nt)
+
+/obj/item/clothing/suit/armor/pcarrier/light/press
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate, /obj/item/clothing/accessory/armor/tag/press)
+
+/obj/item/clothing/suit/armor/pcarrier/medium
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate/medium, /obj/item/clothing/accessory/storage/pouches)
+
+/obj/item/clothing/suit/armor/pcarrier/medium/nt
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate/medium, /obj/item/clothing/accessory/storage/pouches, /obj/item/clothing/accessory/armor/tag/nt)
+
+/obj/item/clothing/suit/armor/pcarrier/blue
+	name = "blue plate carrier"
+	desc = "A lightweight blue plate carrier vest. It can be equipped with armor plates, but provides no protection of its own."
+	icon_state = "pcarrier_blue"
+
+/obj/item/clothing/suit/armor/pcarrier/green
+	name = "green plate carrier"
+	desc = "A lightweight green plate carrier vest. It can be equipped with armor plates, but provides no protection of its own."
+	icon_state = "pcarrier_green"
+
+/obj/item/clothing/suit/armor/pcarrier/navy
+	name = "navy plate carrier"
+	desc = "A lightweight navy blue plate carrier vest. It can be equipped with armor plates, but provides no protection of its own."
+	icon_state = "pcarrier_navy"
+
+/obj/item/clothing/suit/armor/pcarrier/tan
+	name = "tan plate carrier"
+	desc = "A lightweight tan plate carrier vest. It can be equipped with armor plates, but provides no protection of its own."
+	icon_state = "pcarrier_tan"
+
+/obj/item/clothing/suit/armor/pcarrier/tan/tactical
+	name = "tactical plate carrier"
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate/tactical, /obj/item/clothing/accessory/storage/pouches/large/tan)
+
+/obj/item/clothing/suit/armor/pcarrier/merc
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate/merc, /obj/item/clothing/accessory/armguards/merc, /obj/item/clothing/accessory/legguards/merc, /obj/item/clothing/accessory/storage/pouches/large)
 
 
 //All of the armor below is mostly unused
@@ -433,3 +472,9 @@
 	icon_state = "tdgreen"
 	item_state = "tdgreen"
 	siemens_coefficient = 1
+
+/obj/item/clothing/suit/storage/vest/tactical/mirania
+	name = "bundeforz armored vest"
+	desc = "A heavy armored vest in a light grey urban camo. It is surprisingly flexible and light, even with the extra webbing and advanced ceramic plates."
+	icon_state = "m_vest"
+	item_state = "m_vest"

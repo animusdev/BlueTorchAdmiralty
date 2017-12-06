@@ -11,11 +11,11 @@
  *		Snap pops
  *		Water flower
  *      Therapy dolls
- *      Toddler doll
  *      Inflatable duck
  *		Action figures
  *		Plushies
  *		Toy cult sword
+ *		Marshalling wand
  */
 
 
@@ -38,10 +38,8 @@
 	item_state = "balloon-empty"
 
 /obj/item/toy/water_balloon/New()
+	create_reagents(10)
 	..()
-	var/datum/reagents/R = new/datum/reagents(10)
-	reagents = R
-	R.my_atom = src
 
 /obj/item/toy/water_balloon/attack(mob/living/carbon/human/M as mob, mob/user as mob)
 	return
@@ -61,7 +59,7 @@
 			if(O.reagents.total_volume < 1)
 				to_chat(user, "The [O] is empty.")
 			else if(O.reagents.total_volume >= 1)
-				if(O.reagents.has_reagent("pacid", 1))
+				if(O.reagents.has_reagent(/datum/reagent/acid/polyacid, 1))
 					to_chat(user, "The acid chews through the balloon!")
 					O.reagents.splash(user, reagents.total_volume)
 					qdel(src)
@@ -777,18 +775,6 @@
 	w_class = ITEM_SIZE_HUGE
 	attack_verb = list("attacked", "slashed", "stabbed", "poked")
 
-/* NYET.
-/obj/item/weapon/toddler
-	icon_state = "toddler"
-	name = "toddler"
-	desc = "This baby looks almost real. Wait, did it just burp?"
-	force = 5
-	w_class = ITEM_SIZE_HUGE
-	slot_flags = SLOT_BACK
-*/
-
-//This should really be somewhere else but I don't know where. w/e
-
 /obj/item/weapon/inflatable_duck
 	name = "inflatable duck"
 	desc = "No bother to sink or swim when you can just float!"
@@ -796,3 +782,46 @@
 	item_state = "inflatable"
 	icon = 'icons/obj/clothing/belts.dmi'
 	slot_flags = SLOT_BELT
+
+/obj/item/weapon/marshalling_wand
+	name = "marshalling wand"
+	desc = "An illuminated, hand-held baton used by hangar personnel to visually signal shuttle pilots. The signal changes depending on your intent."
+	icon_state = "marshallingwand"
+	item_state = "marshallingwand"
+	icon = 'icons/obj/toy.dmi'
+	item_icons = list(
+		icon_l_hand = 'icons/mob/items/lefthand.dmi',
+		icon_r_hand = 'icons/mob/items/righthand.dmi',
+		)
+	slot_flags = SLOT_BELT
+	w_class = ITEM_SIZE_SMALL
+	force = 1
+	attack_verb = list("attacked", "whacked", "jabbed", "poked", "marshalled")
+
+/obj/item/weapon/marshalling_wand/Initialize()
+	set_light(1.5, 1.5, "#ff0000")
+	return ..()
+
+/obj/item/weapon/marshalling_wand/attack_self(mob/living/user as mob)
+	if (user.a_intent == I_HELP)
+		user.visible_message("<span class='notice'>[user] beckons with \the [src], signalling forward motion.</span>",
+							"<span class='notice'>You beckon with \the [src], signalling forward motion.</span>")
+	else if (user.a_intent == I_DISARM)
+		user.visible_message("<span class='notice'>[user] holds \the [src] above their head, signalling a stop.</span>",
+							"<span class='notice'>You hold \the [src] above your head, signalling a stop.</span>")
+	else if (user.a_intent == I_GRAB)
+		var/WAND_TURN_DIRECTION
+		if (user.l_hand == src) WAND_TURN_DIRECTION = "left"
+		else if (user.r_hand == src) WAND_TURN_DIRECTION = "right"
+		else return //how can you not be holding it in either hand?? black magic
+		user.visible_message("<span class='notice'>[user] waves \the [src] to the [WAND_TURN_DIRECTION], signalling a turn.</span>",
+							"<span class='notice'>You wave \the [src] to the [WAND_TURN_DIRECTION], signalling a turn.</span>")
+	else if (user.a_intent == I_HURT)
+		user.visible_message("<span class='warning'>[user] frantically waves \the [src] above their head!</span>",
+							"<span class='warning'>You frantically wave \the [src] above your head!</span>")
+
+/obj/item/toy/torchmodel
+	name = "table-top SEV Torch model"
+	desc = "This is an SEV Torch replica in scale 1:250 on wooden stand. Small lights blink on the hull and at the engine exhaust."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "torch_model_figure"

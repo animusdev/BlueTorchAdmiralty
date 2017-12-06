@@ -58,7 +58,7 @@
 		if(applies_material_colour)
 			color = material.icon_colour
 		if(material.products_need_process())
-			processing_objects |= src
+			START_PROCESSING(SSobj, src)
 		if(material.conductive)
 			flags |= CONDUCT
 		else
@@ -66,8 +66,8 @@
 		update_force()
 
 /obj/item/weapon/material/Destroy()
-	processing_objects -= src
-	..()
+	STOP_PROCESSING(SSobj, src)
+	. = ..()
 
 /obj/item/weapon/material/apply_hit_effect()
 	. = ..()

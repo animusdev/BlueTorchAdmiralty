@@ -10,7 +10,7 @@
 	var/reverse = 0 //if resulting object faces opposite its dir (like light fixtures)
 
 /obj/item/frame/attackby(obj/item/weapon/W as obj, mob/user as mob)
-	if (istype(W, /obj/item/weapon/wrench))
+	if(isWrench(W))
 		new refund_type( get_turf(src.loc), refund_amt)
 		qdel(src)
 		return
@@ -29,7 +29,7 @@
 	else
 		ndir = get_dir(on_wall,usr)
 
-	if (!(ndir in cardinal))
+	if (!(ndir in GLOB.cardinal))
 		return
 
 	var/turf/loc = get_turf(usr)
