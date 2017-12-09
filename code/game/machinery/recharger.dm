@@ -57,7 +57,7 @@ obj/machinery/recharger/attackby(obj/item/weapon/G as obj, mob/user as mob)
 			G.forceMove(src)
 			charging = G
 			update_icon()
-	else if(portable && istype(G, /obj/item/weapon/wrench))
+	else if(portable && isWrench(G))
 		if(charging)
 			to_chat(user, "<span class='warning'>Remove [charging] first!</span>")
 			return
@@ -77,7 +77,7 @@ obj/machinery/recharger/attack_hand(mob/user as mob)
 		charging = null
 		update_icon()
 
-obj/machinery/recharger/process()
+obj/machinery/recharger/Process()
 	if(stat & (NOPOWER|BROKEN) || !anchored)
 		update_use_power(0)
 		icon_state = icon_state_idle

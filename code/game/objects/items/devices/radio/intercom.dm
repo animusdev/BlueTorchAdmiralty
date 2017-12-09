@@ -49,23 +49,23 @@
 	frequency = ENT_FREQ
 	canhear_range = 4
 
-/obj/item/device/radio/intercom/New()
-	..()
-	processing_objects += src
+/obj/item/device/radio/intercom/Initialize()
+	. = ..()
+	START_PROCESSING(SSobj, src)
 
-/obj/item/device/radio/intercom/department/medbay/New()
-	..()
-	internal_channels = default_medbay_channels.Copy()
+/obj/item/device/radio/intercom/department/medbay/Initialize()
+	. = ..()
+	internal_channels = GLOB.default_medbay_channels.Copy()
 
-/obj/item/device/radio/intercom/department/security/New()
-	..()
+/obj/item/device/radio/intercom/department/security/Initialize()
+	. = ..()
 	internal_channels = list(
 		num2text(PUB_FREQ) = list(),
 		num2text(SEC_I_FREQ) = list(access_security)
 	)
 
-/obj/item/device/radio/intercom/entertainment/New()
-	..()
+/obj/item/device/radio/intercom/entertainment/Initialize()
+	. = ..()
 	internal_channels = list(
 		num2text(PUB_FREQ) = list(),
 		num2text(ENT_FREQ) = list()
@@ -78,8 +78,8 @@
 	subspace_transmission = 1
 	syndie = 1
 
-/obj/item/device/radio/intercom/syndicate/New()
-	..()
+/obj/item/device/radio/intercom/syndicate/Initialize()
+	. = ..()
 	internal_channels[num2text(SYND_FREQ)] = list(access_syndicate)
 
 /obj/item/device/radio/intercom/raider
@@ -89,13 +89,13 @@
 	subspace_transmission = 1
 	syndie = 1
 
-/obj/item/device/radio/intercom/raider/New()
-	..()
+/obj/item/device/radio/intercom/raider/Initialize()
+	. = ..()
 	internal_channels[num2text(RAID_FREQ)] = list(access_syndicate)
 
 /obj/item/device/radio/intercom/Destroy()
-	processing_objects -= src
-	..()
+	STOP_PROCESSING(SSobj, src)
+	return ..()
 
 /obj/item/device/radio/intercom/attack_ai(mob/user as mob)
 	src.add_fingerprint(user)
@@ -122,7 +122,7 @@
 
 	return canhear_range
 
-/obj/item/device/radio/intercom/process()
+/obj/item/device/radio/intercom/Process()
 	if(((world.timeofday - last_tick) > 30) || ((world.timeofday - last_tick) < 0))
 		last_tick = world.timeofday
 
@@ -144,21 +144,20 @@
 	broadcasting = 1
 
 /obj/item/device/radio/intercom/locked
-    var/locked_frequency
+	var/locked_frequency
 
-/obj/item/device/radio/intercom/locked/set_frequency(var/frequency)
-	if(frequency == locked_frequency)
-		..(locked_frequency)
+/obj/item/device/radio/intercom/locked/set_frequency()
+	..(locked_frequency)
 
 /obj/item/device/radio/intercom/locked/list_channels()
 	return ""
 
 /obj/item/device/radio/intercom/locked/ai_private
 	name = "\improper AI intercom"
-	frequency = AI_FREQ
+	locked_frequency = AI_FREQ
 	broadcasting = 1
 	listening = 1
 
 /obj/item/device/radio/intercom/locked/confessional
 	name = "confessional intercom"
-	frequency = 1480
+	locked_frequency = 1480

@@ -23,6 +23,7 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 	produces_heat = 0
 	delay = 7
 	circuitboard = /obj/item/weapon/circuitboard/telecomms/broadcaster
+	outage_probability = 10
 
 /obj/machinery/telecomms/broadcaster/receive_information(datum/signal/signal, obj/machinery/telecomms/machine_from)
 	// Don't broadcast rejected signals
@@ -48,7 +49,7 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 		if(signal.data["slow"] > 0)
 			sleep(signal.data["slow"]) // simulate the network lag if necessary
 
-		signal.data["level"] |= listening_level
+		signal.data["level"] |= listening_levels
 
 	   /** #### - Normal Broadcast - #### **/
 
@@ -71,7 +72,7 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 			/* ###### Broadcast a message using signal.data ###### */
 			Broadcast_SimpleMessage(signal.data["name"], signal.frequency,
 								  signal.data["message"],null, null,
-								  signal.data["compression"], listening_level)
+								  signal.data["compression"], listening_levels)
 
 
 	   /** #### - Artificial Broadcast - #### **/
@@ -290,7 +291,7 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 			continue
 
 		// Ghosts hearing all radio chat don't want to hear syndicate intercepts, they're duplicates
-		if(data == 3 && isghost(R) && R.is_preference_enabled(/datum/client_preference/ghost_radio))
+		if(data == 3 && isghost(R) && R.get_preference_value(/datum/client_preference/ghost_radio) == GLOB.PREF_ALL_CHATTER)
 			continue
 
 		// --- Check for compression ---
@@ -377,6 +378,8 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 					blackbox.msg_cargo += blackbox_msg
 				if(SRV_FREQ)
 					blackbox.msg_service += blackbox_msg
+				if(EXP_FREQ)
+					blackbox.msg_exploration += blackbox_msg
 				else
 					blackbox.messages += blackbox_msg
 
@@ -554,6 +557,8 @@ var/message_delay = 0 // To make sure restarting the recentmessages list is kept
 					blackbox.msg_cargo += blackbox_msg
 				if(SRV_FREQ)
 					blackbox.msg_service += blackbox_msg
+				if(EXP_FREQ)
+					blackbox.msg_exploration += blackbox_msg
 				else
 					blackbox.messages += blackbox_msg
 

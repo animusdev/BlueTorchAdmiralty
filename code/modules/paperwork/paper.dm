@@ -42,7 +42,7 @@
 /obj/item/weapon/paper/proc/set_content(text,title)
 	if(title)
 		name = title
-	info = rhtml_encode(text)
+	info = html_encode(text)
 	info = parsepencode(text)
 	update_icon()
 	update_space(info)
@@ -194,9 +194,9 @@
 	return (user && user.real_name) ? user.real_name : "Anonymous"
 
 /obj/item/weapon/paper/proc/parsepencode(t, obj/item/weapon/pen/P, mob/user, iscrayon)
-	t = cp1251_to_utf8(t)
 	if(length(t) == 0)
 		return ""
+
 	if(findtext(t, "\[sign\]"))
 		t = replacetext(t, "\[sign\]", "<font face=\"[signfont]\"><i>[get_signature(P, user)]</i></font>")
 
@@ -367,7 +367,7 @@
 			user << browse("<HTML><HEAD><TITLE>[name]</TITLE></HEAD><BODY bgcolor='[color]'>[info_links][stamps]</BODY></HTML>", "window=[name]")
 		return
 
-	else if(istype(P, /obj/item/weapon/stamp))
+	else if(istype(P, /obj/item/weapon/stamp) || istype(P, /obj/item/clothing/ring/seal))
 		if((!in_range(src, usr) && loc != user && !( istype(loc, /obj/item/weapon/clipboard) ) && loc.loc != user && user.get_active_hand() != P))
 			return
 
@@ -401,10 +401,15 @@
 		stamped += P.type
 		overlays += stampoverlay
 
-		to_chat(user, "<span class='notice'>You stamp the paper with your rubber stamp.</span>")
+		to_chat(user, "<span class='notice'>You stamp the paper with your [P.name].</span>")
 
 	else if(istype(P, /obj/item/weapon/flame))
 		burnpaper(P, user)
+
+	else if(istype(P, /obj/item/weapon/paper_bundle))
+		var/obj/item/weapon/paper_bundle/attacking_bundle = P
+		attacking_bundle.insert_sheet_at(user, (attacking_bundle.pages.len)+1, src)
+		attacking_bundle.update_icon()
 
 	add_fingerprint(user)
 	return
@@ -441,3 +446,12 @@
 /obj/item/weapon/paper/exodus_holodeck
 	name = "holodeck disclaimer"
 	info = "Bruises sustained in the holodeck can be healed simply by sleeping."
+
+/obj/item/weapon/paper/workvisa
+	name = "Sol Work Visa"
+	info = "<center><b><large>Work Visa of the Sol Central Government</large></b></center><br><center><img src = sollogo.png><br><br><i><small>Issued on behalf of the Secretary-General.</small></i></center><hr><BR>This paper hereby permits the carrier to travel unhindered through Sol territories, colonies, and space for the purpose of work and labor."
+	desc = "A flimsy piece of laminated cardboard issued by the Sol Central Government."
+
+/obj/item/weapon/paper/workvisa/New()
+	..()
+	icon_state = "workvisa" //Has to be here or it'll assume default paper sprites.

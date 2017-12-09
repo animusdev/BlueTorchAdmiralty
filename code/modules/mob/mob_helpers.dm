@@ -160,12 +160,15 @@ var/list/global/organ_rel_size = list(
 	zone = check_zone(zone)
 
 	if(!ranged_attack)
+		// target isn't trying to fight
+		if(target.a_intent == I_HELP)
+			return zone
 		// you cannot miss if your target is prone or restrained
 		if(target.buckled || target.lying)
 			return zone
 		// if your target is being grabbed aggressively by someone you cannot miss either
-		for(var/obj/item/weapon/grab/G in target.grabbed_by)
-			if(G.state >= GRAB_AGGRESSIVE)
+		for(var/obj/item/grab/G in target.grabbed_by)
+			if(G.stop_move())
 				return zone
 
 	var/miss_chance = 10
@@ -182,7 +185,7 @@ var/list/global/organ_rel_size = list(
 /proc/stars(n, pr)
 	if (pr == null)
 		pr = 25
-	if (pr <= 0)
+	if (pr < 0)
 		return null
 	else
 		if (pr >= 100)
@@ -207,7 +210,7 @@ var/list/global/organ_rel_size = list(
 	return t
 
 proc/slur(phrase)
-	phrase = rhtml_decode(phrase)
+	phrase = html_decode(phrase)
 	var/leng=lentext(phrase)
 	var/counter=lentext(phrase)
 	var/newphrase=""
@@ -215,13 +218,13 @@ proc/slur(phrase)
 	while(counter>=1)
 		newletter=copytext(phrase,(leng-counter)+1,(leng-counter)+2)
 		if(rand(1,3)==3)
-			if(rlowertext(newletter)=="o")	newletter="u"
-			if(rlowertext(newletter)=="s")	newletter="ch"
-			if(rlowertext(newletter)=="a")	newletter="ah"
-			if(rlowertext(newletter)=="c")	newletter="k"
+			if(lowertext(newletter)=="o")	newletter="u"
+			if(lowertext(newletter)=="s")	newletter="ch"
+			if(lowertext(newletter)=="a")	newletter="ah"
+			if(lowertext(newletter)=="c")	newletter="k"
 		switch(rand(1,15))
-			if(1,3,5,8)	newletter="[rlowertext(newletter)]"
-			if(2,4,6,15)	newletter="[ruppertext(newletter)]"
+			if(1,3,5,8)	newletter="[lowertext(newletter)]"
+			if(2,4,6,15)	newletter="[uppertext(newletter)]"
 			if(7)	newletter+="'"
 			//if(9,10)	newletter="<b>[newletter]</b>"
 			//if(11,12)	newletter="<big>[newletter]</big>"
@@ -230,7 +233,7 @@ proc/slur(phrase)
 	return newphrase
 
 /proc/stutter(n)
-	var/te = rhtml_decode(n)
+	var/te = html_decode(n)
 	var/t = ""//placed before the message. Not really sure what it's for.
 	n = length(n)//length of the entire word
 	var/p = null
@@ -277,7 +280,7 @@ The difference with stutter is that this proc can stutter more than 1 letter
 The issue here is that anything that does not have a space is treated as one word (in many instances). For instance, "LOOKING," is a word, including the comma.
 It's fairly easy to fix if dealing with single letters but not so much with compounds of letters./N
 */
-	var/te = rhtml_decode(n)
+	var/te = html_decode(n)
 	var/t = ""
 	n = length(n)
 	var/p = 1
@@ -325,7 +328,7 @@ It's fairly easy to fix if dealing with single letters but not so much with comp
 
 
 /proc/findname(msg)
-	for(var/mob/M in mob_list)
+	for(var/mob/M in SSmobs.mob_list)
 		if (M.real_name == text("[msg]"))
 			return 1
 	return 0
@@ -394,21 +397,21 @@ proc/is_blind(A)
 	return 0
 
 /proc/broadcast_security_hud_message(var/message, var/broadcast_source)
-	broadcast_hud_message(message, broadcast_source, sec_hud_users, /obj/item/clothing/glasses/hud/security)
+	broadcast_hud_message(message, broadcast_source, GLOB.sec_hud_users, /obj/item/clothing/glasses/hud/security)
 
 /proc/broadcast_medical_hud_message(var/message, var/broadcast_source)
-	broadcast_hud_message(message, broadcast_source, med_hud_users, /obj/item/clothing/glasses/hud/health)
+	broadcast_hud_message(message, broadcast_source, GLOB.med_hud_users, /obj/item/clothing/glasses/hud/health)
 
 /proc/broadcast_hud_message(var/message, var/broadcast_source, var/list/targets, var/icon)
 	var/turf/sourceturf = get_turf(broadcast_source)
 	for(var/mob/M in targets)
 		var/turf/targetturf = get_turf(M)
-		if((targetturf.z == sourceturf.z))
+		if(!sourceturf || (targetturf.z in GetConnectedZlevels(sourceturf.z)))
 			M.show_message("<span class='info'>\icon[icon] [message]</span>", 1)
 
 /proc/mobs_in_area(var/area/A)
 	var/list/mobs = new
-	for(var/mob/living/M in mob_list)
+	for(var/mob/living/M in SSmobs.mob_list)
 		if(get_area(M) == A)
 			mobs += M
 	return mobs
@@ -522,11 +525,11 @@ proc/is_blind(A)
 		if(id)
 			perpname = id.registered_name
 
-		var/datum/data/record/R = find_security_record("name", perpname)
-		if(check_records && !R && !isMonkey())
+		var/datum/computer_file/crew_record/CR = get_crewmember_record(perpname)
+		if(check_records && !CR && !isMonkey())
 			threatcount += 4
 
-		if(check_arrest && R && (R.fields["criminal"] == "*Arrest*"))
+		if(check_arrest && CR && (CR.get_criminalStatus() == GLOB.arrest_security_status))
 			threatcount += 4
 
 	return threatcount
@@ -599,3 +602,23 @@ proc/is_blind(A)
 
 /mob/proc/ssd_check()
 	return !client && !teleop
+
+/mob/proc/jittery_damage()
+	return //Only for living/carbon/human/
+
+/mob/living/carbon/human/jittery_damage()
+	var/mob/living/carbon/human/H = src
+	var/obj/item/organ/internal/heart/L = H.internal_organs_by_name[BP_HEART]
+	if(L && istype(L))
+		if(L.robotic >= ORGAN_ROBOT)
+			return 0//Robotic hearts don't get jittery.
+	if(src.jitteriness >= 400 && prob(5)) //Kills people if they have high jitters.
+		if(prob(1))
+			L.take_damage(L.max_damage / 2, 0)
+			to_chat(src, "<span class='danger'>Something explodes in your heart.</span>")
+			admin_victim_log(src, "has taken <b>lethal heart damage</b> at jitteriness level [src.jitteriness].")
+		else
+			L.take_damage(1, 0)
+			to_chat(src, "<span class='danger'>The jitters are killing you! You feel your heart beating out of your chest.</span>")
+			admin_victim_log(src, "has taken <i>minor heart damage</i> at jitteriness level [src.jitteriness].")
+	return 1

@@ -491,15 +491,3 @@
 		query_list += word
 
 	return query_list
-
-#ifdef DEBUG
-/client/verb/SDQLtest_query(query_text as message)
-	set hidden = 1
-	set category = null
-	establish_db_connection()
-	if(!dbcon.IsConnected())
-		to_chat(usr, "<span class='warning'>Failed to establish database connection</span>")
-		return
-	var/DBQuery/select_query = dbcon.NewQuery("[query_text]")
-	select_query.Execute()
-#endif

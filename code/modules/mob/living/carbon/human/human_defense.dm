@@ -22,16 +22,32 @@ meteor_act
 			P.on_hit(src, 100, def_zone)
 			return 100
 
-	//Shrapnel
-	if(!(species.flags & NO_EMBED) && P.can_embed())
-		var/obj/item/organ/external/organ = get_organ(def_zone)
-		var/armor = getarmor_organ(organ, "bullet")
-		if(prob(20 + max(P.damage - armor, -10)))
-			var/obj/item/weapon/material/shard/shrapnel/SP = new()
-			SP.name = (P.name != "shrapnel")? "[P.name] shrapnel" : "shrapnel"
-			SP.desc = "[SP.desc] It looks like it was fired from [P.shot_from]."
-			SP.loc = organ
-			organ.embed(SP)
+	var/obj/item/organ/external/organ = get_organ(def_zone)
+	var/armor = getarmor_organ(organ, P.check_armour)
+	var/penetrating_damage = ((P.damage + P.armor_penetration) * P.penetration_modifier) - armor
+
+	//Organ damage
+	if(organ.internal_organs.len && prob(35 + max(penetrating_damage, -12.5)))
+		var/damage_amt = min((P.damage * P.penetration_modifier), penetrating_damage) //So we don't factor in armor_penetration as additional damage
+		if(damage_amt > 0)
+		// Damage an internal organ
+			var/list/victims = list()
+			var/list/possible_victims = shuffle(organ.internal_organs.Copy())
+			for(var/obj/item/organ/internal/I in possible_victims)
+				if(I.damage < I.max_damage && (prob((I.relative_size) * (1 / max(1, victims.len)))))
+					victims += I
+			if(victims.len)
+				for(var/obj/item/organ/victim in victims)
+					damage_amt /= 2
+					victim.take_damage(damage_amt)
+
+	//Embed or sever artery
+	if(P.can_embed() && !(species.flags & NO_EMBED) && prob(22.5 + max(penetrating_damage, -10)) && !(prob(50) && (organ.sever_artery())))
+		var/obj/item/weapon/material/shard/shrapnel/SP = new()
+		SP.name = (P.name != "shrapnel")? "[P.name] shrapnel" : "shrapnel"
+		SP.desc = "[SP.desc] It looks like it was fired from [P.shot_from]."
+		SP.loc = organ
+		organ.embed(SP)
 
 	var/blocked = ..(P, def_zone)
 
@@ -92,13 +108,19 @@ meteor_act
 //this proc returns the armour value for a particular external organ.
 /mob/living/carbon/human/proc/getarmor_organ(var/obj/item/organ/external/def_zone, var/type)
 	if(!type || !def_zone) return 0
+	if(!istype(def_zone))
+		def_zone = get_organ(check_zone(def_zone))
+	if(!def_zone)
+		return 0
 	var/protection = 0
 	var/list/protective_gear = list(head, wear_mask, wear_suit, w_uniform, gloves, shoes)
-	for(var/gear in protective_gear)
-		if(gear && istype(gear ,/obj/item/clothing))
-			var/obj/item/clothing/C = gear
-			if(istype(C) && C.body_parts_covered & def_zone.body_part)
-				protection = add_armor(protection, C.armor[type])
+	for(var/obj/item/clothing/gear in protective_gear)
+		if(gear.body_parts_covered & def_zone.body_part)
+			protection = add_armor(protection, gear.armor[type])
+		if(gear.accessories.len)
+			for(var/obj/item/clothing/accessory/bling in gear.accessories)
+				if(bling.body_parts_covered & def_zone.body_part)
+					protection = add_armor(protection, bling.armor[type])
 	return protection
 
 /mob/living/carbon/human/proc/check_head_coverage()
@@ -127,55 +149,11 @@ meteor_act
 		if(.) return
 	return 0
 
-
-/mob/living/carbon/human/attack_throat(var/obj/item/W, var/obj/item/weapon/grab/G, var/mob/user)
-	. = ..()
-	if(.)
-		var/obj/item/organ/external/head = get_organ(BP_HEAD)
-		if(head) head.sever_artery()
-
-/mob/living/carbon/human/proc/check_attack_tendons(var/obj/item/W, var/mob/living/user, var/target_zone)
-
-	if(!W.edge || !W.force || W.damtype != BRUTE)
-		return FALSE
-	var/obj/item/organ/external/affecting = get_organ(target_zone)
-	if(!affecting || affecting.is_stump() || !affecting.has_tendon || (affecting.status & ORGAN_TENDON_CUT))
-		return FALSE
-
-	var/obj/item/weapon/grab/grab
-	if(user.a_intent == I_HURT)
-		for(var/obj/item/weapon/grab/G in src.grabbed_by)
-			if(G.assailant == user && G.state >= GRAB_NECK)
-				grab = G
-				break
-	if(!grab)
-		return FALSE
-
-	user.visible_message("<span class='danger'>\The [user] begins to cut \the [src]'s [affecting.tendon_name] with \the [W]!</span>")
-	user.next_move = world.time + 20
-
-	if(!do_after(user, 20, progress=0))
-		return FALSE
-	if(!grab || grab.assailant != user || grab.affecting != src)
-		return FALSE
-	if(!affecting || affecting.is_stump() || !affecting.sever_tendon())
-		return FALSE
-
-	user.visible_message("<span class='danger'>\The [user] cut \the [src]'s [affecting.tendon_name] with \the [W]!</span>")
-	if(W.hitsound) playsound(loc, W.hitsound, 50, 1, -1)
-	grab.last_action = world.time
-	flick(grab.hud.icon_state, grab.hud)
-	admin_attack_log(user, src, "hamstrung their victim", "was hamstrung", "hamstrung")
-
-	return TRUE
-
 /mob/living/carbon/human/resolve_item_attack(obj/item/I, mob/living/user, var/target_zone)
 
-	if(check_attack_throat(I, user))
-		return null
-
-	if(check_attack_tendons(I, user, target_zone))
-		return null
+	for (var/obj/item/grab/G in grabbed_by)
+		if(G.resolve_item_attack(user, I, target_zone))
+			return null
 
 	if(user == src) // Attacking yourself can't miss
 		return target_zone
@@ -226,7 +204,7 @@ meteor_act
 		return 0
 
 	if(effective_force > 10 || effective_force >= 5 && prob(33))
-		forcesay(hit_appends)	//forcesay checks stat already
+		forcesay(GLOB.hit_appends)	//forcesay checks stat already
 	if((I.damtype == BRUTE || I.damtype == PAIN) && prob(25 + (effective_force * 2)))
 		if(!stat)
 			if(headcheck(hit_zone))

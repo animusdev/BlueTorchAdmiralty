@@ -29,7 +29,7 @@
 	if (nref)
 		ref = nref
 	// If a client exists, but they have disabled fancy windowing, disable it!
-	if(user && user.client && !user.client.is_preference_enabled(/datum/client_preference/browser_style))
+	if(user && user.client && user.client.get_preference_value(/datum/client_preference/browser_style) == GLOB.PREF_PLAIN)
 		return
 	add_stylesheet("common", 'html/browser/common.css') // this CSS sheet is common to all UIs
 
@@ -79,7 +79,7 @@
 
 	return {"<!DOCTYPE html>
 <html>
-	<meta charset=windows-1251">
+	<meta charset=ISO-8859-1">
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		[head_content]
@@ -111,6 +111,12 @@
 	user << browse(get_content(), "window=[window_id];[window_size][window_options]")
 	if (use_onclose)
 		onclose(user, window_id, ref)
+
+/datum/browser/proc/update(var/force_open = 0, var/use_onclose = 1)
+	if(force_open)
+		open(use_onclose)
+	else
+		send_output(user, get_content(), "[window_id].browser")
 
 /datum/browser/proc/close()
 	user << browse(null, "window=[window_id]")
@@ -153,7 +159,9 @@
 	if(ref)
 		param = "\ref[ref]"
 
-	winset(user, windowid, "on-close=\".windowclose [param]\"")
+	spawn(2)
+		if(!user.client) return
+		winset(user, windowid, "on-close=\".windowclose [param]\"")
 
 //	log_debug("OnClose [user]: [windowid] : ["on-close=\".windowclose [param]\""]")
 

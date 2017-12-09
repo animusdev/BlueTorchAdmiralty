@@ -27,8 +27,8 @@
 		var/received_message = t.receive_looc(C, key, message, listening_mob.looc_prefix())
 		receive_communication(C, t, received_message)
 
-	for(var/client/adm in admins)	//Now send to all admins that weren't in range.
-		if(!(adm in listening_clients) && adm.is_preference_enabled(/datum/client_preference/holder/show_rlooc))
+	for(var/client/adm in GLOB.admins)	//Now send to all admins that weren't in range.
+		if(!(adm in listening_clients) && adm.get_preference_value(/datum/client_preference/staff/show_rlooc) == GLOB.PREF_SHOW)
 			var/received_message = adm.receive_looc(C, key, message, "R")
 			receive_communication(C, adm, received_message)
 

@@ -43,6 +43,7 @@
 	var/drowsy = 0
 	var/agony = 0
 	var/embed = 0 // whether or not the projectile can embed itself in the mob
+	var/penetration_modifier = 0.2 //How much internal damage this projectile can deal, as a multiplier.
 
 	var/hitscan = 0		// whether the projectile should be hitscan
 	var/step_delay = 1	// the delay between iterations if not a hitscan projectile
@@ -135,7 +136,7 @@
 
 	spawn()
 		setup_trajectory(curloc, targloc, x_offset, y_offset, angle_offset) //plot the initial trajectory
-		process()
+		Process()
 
 	return 0
 
@@ -226,8 +227,8 @@
 		var/mob/M = A
 		if(istype(A, /mob/living))
 			//if they have a neck grab on someone, that person gets hit instead
-			var/obj/item/weapon/grab/G = locate() in M
-			if(G && G.state >= GRAB_NECK)
+			var/obj/item/grab/G = locate() in M
+			if(G && G.shield_assailant())
 				visible_message("<span class='danger'>\The [M] uses [G.affecting] as a shield!</span>")
 				if(Bump(G.affecting, forced=1))
 					return //If Bump() returns 0 (keep going) then we continue on to attack M.
@@ -265,7 +266,7 @@
 	on_impact(A)
 
 	set_density(0)
-	invisibility = 101
+	set_invisibility(101)
 
 	qdel(src)
 	return 1
@@ -276,7 +277,7 @@
 /obj/item/projectile/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
 	return 1
 
-/obj/item/projectile/process()
+/obj/item/projectile/Process()
 	var/first_step = 1
 
 	spawn while(src && src.loc)
@@ -411,9 +412,9 @@
 
 	//plot the initial trajectory
 	setup_trajectory(curloc, targloc)
-	return process(targloc)
+	return Process(targloc)
 
-/obj/item/projectile/test/process(var/turf/targloc)
+/obj/item/projectile/test/Process(var/turf/targloc)
 	while(src) //Loop on through!
 		if(result)
 			return (result - 1)

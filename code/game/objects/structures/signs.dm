@@ -21,7 +21,7 @@
 	return
 
 /obj/structure/sign/attackby(obj/item/tool as obj, mob/user as mob)	//deconstruction
-	if(istype(tool, /obj/item/weapon/screwdriver) && !istype(src, /obj/structure/sign/double))
+	if(isScrewdriver(tool) && !istype(src, /obj/structure/sign/double))
 		to_chat(user, "You unfasten the sign with your [tool.name].")
 		var/obj/item/sign/S = new(src.loc)
 		S.name = name
@@ -82,6 +82,9 @@
 /obj/structure/sign/warning
 	name = "\improper WARNING"
 	icon_state = "securearea"
+
+/obj/structure/sign/warning/detailed
+	icon_state = "securearea2"
 
 /obj/structure/sign/warning/New()
 	..()
@@ -149,6 +152,7 @@
 
 /obj/structure/sign/warning/moving_parts
 	name = "\improper MOVING PARTS"
+	icon_state = "movingparts"
 
 /obj/structure/sign/warning/nosmoking_1
 	name = "\improper NO SMOKING"
@@ -171,9 +175,11 @@
 
 /obj/structure/sign/warning/secure_area/armory
 	name = "\improper ARMORY"
+	icon_state = "armory"
 
 /obj/structure/sign/warning/server_room
 	name = "\improper SERVER ROOM"
+	icon_state = "server"
 
 /obj/structure/sign/warning/siphon_valve
 	name = "\improper SIPHON VALVE"
@@ -232,16 +238,6 @@
 	name = "\improper commemorative plaque"
 	desc = "A list of dead explorers who gave their lives in search of the next great discovery. Hope you don't join them."
 	icon_state = "floorplaque"
-
-/obj/structure/sign/double/solgovflag
-	name = "Sol Central Government Flag"
-	desc = "The flag of the Sol Central Government, a symbol of many things to many people."
-
-/obj/structure/sign/double/solgovflag/left
-	icon_state = "solgovflag-left"
-
-/obj/structure/sign/double/solgovflag/right
-	icon_state = "solgovflag-right"
 
 /obj/structure/sign/double/maltesefalcon	//The sign is 64x32, so it needs two tiles. ;3
 	name = "The Maltese Falcon"
@@ -388,3 +384,23 @@
 	name = "\improper Fourth Deck"
 	icon_state = "deck-4"
 
+/obj/item/sign/medipolma
+	name = "medical diploma"
+	desc = "A fancy print laminated paper that certifies that its bearer is indeed a Doctor of Medicine, graduated from a medical school in one of fringe systems. You don't recognize the name though, and half of latin words they used do not actually exist."
+	icon = 'icons/obj/decals.dmi'
+	icon_state = "goldenplaque"
+	sign_state = "goldenplaque"
+	var/claimant
+
+/obj/item/sign/medipolma/attack_self(mob/user)
+	if(!claimant)
+		to_chat(user, "<span class='notice'>You fill in your name in the blanks with a permanent marker.</span>")
+		claimant = user.real_name
+	..()
+
+/obj/item/sign/medipolma/examine(mob/user)
+	..()
+	if(claimant)
+		to_chat(user,"This one belongs to Dr.[claimant], MD.")
+	else
+		to_chat(user,"The name is left blank for some reason.")

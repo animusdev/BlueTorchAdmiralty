@@ -46,7 +46,7 @@ var/list/admin_ranks = list()								//list of all ranks with associated rights
 		admin_ranks[rank] = rights
 		previous_rights = rights
 
-	#ifdef DEBUG
+	#ifdef TESTING
 	var/msg = "Permission Sets Built:\n"
 	for(var/rank in admin_ranks)
 		msg += "\t[rank] - [admin_ranks[rank]]\n"
@@ -60,10 +60,10 @@ var/list/admin_ranks = list()								//list of all ranks with associated rights
 /proc/load_admins()
 	//clear the datums references
 	admin_datums.Cut()
-	for(var/client/C in admins)
+	for(var/client/C in GLOB.admins)
 		C.remove_admin_verbs()
 		C.holder = null
-	admins.Cut()
+	GLOB.admins.Cut()
 
 	if(config.admin_legacy_system)
 		load_admin_ranks()
@@ -96,7 +96,7 @@ var/list/admin_ranks = list()								//list of all ranks with associated rights
 			var/datum/admins/D = new /datum/admins(rank, rights, ckey)
 
 			//find the client for a ckey if they are connected and associate them with the new admin datum
-			D.associate(directory[ckey])
+			D.associate(GLOB.ckey_directory[ckey])
 
 	else
 		//The current admin system uses SQL
@@ -121,7 +121,7 @@ var/list/admin_ranks = list()								//list of all ranks with associated rights
 			var/datum/admins/D = new /datum/admins(rank, rights, ckey)
 
 			//find the client for a ckey if they are connected and associate them with the new admin datum
-			D.associate(directory[ckey])
+			D.associate(GLOB.ckey_directory[ckey])
 		if(!admin_datums)
 			error("The database query in load_admins() resulted in no admins being added to the list. Reverting to legacy system.")
 			log_misc("The database query in load_admins() resulted in no admins being added to the list. Reverting to legacy system.")
@@ -140,10 +140,8 @@ var/list/admin_ranks = list()								//list of all ranks with associated rights
 	#endif
 
 
-#ifdef DEBUG
+#ifdef TESTING
 /client/verb/changerank(newrank in admin_ranks)
-	set category = null
-	set hidden = 1
 	if(holder)
 		holder.rank = newrank
 		holder.rights = admin_ranks[newrank]
@@ -151,16 +149,13 @@ var/list/admin_ranks = list()								//list of all ranks with associated rights
 		holder = new /datum/admins(newrank,admin_ranks[newrank],ckey)
 	remove_admin_verbs()
 	holder.associate(src)
-	admins -= usr
 
-/client/verb/changerights(newrights as num, name as text)
-	set category = null
-	set hidden = 1
+/client/verb/changerights(newrights as num)
 	if(holder)
 		holder.rights = newrights
 	else
-		holder = new /datum/admins(name,newrights,ckey)
+		holder = new /datum/admins("testing",newrights,ckey)
 	remove_admin_verbs()
 	holder.associate(src)
-	admins -= usr
+
 #endif

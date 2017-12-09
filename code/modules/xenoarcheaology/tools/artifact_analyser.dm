@@ -14,8 +14,8 @@
 	var/obj/scanned_object
 	var/report_num = 0
 
-/obj/machinery/artifact_analyser/initialize()
-	..()
+/obj/machinery/artifact_analyser/Initialize()
+	. = ..()
 	reconnect_scanner()
 
 /obj/machinery/artifact_analyser/proc/reconnect_scanner()
@@ -54,7 +54,7 @@
 	user.set_machine(src)
 	onclose(user, "artanalyser")
 
-/obj/machinery/artifact_analyser/process()
+/obj/machinery/artifact_analyser/Process()
 	if(scan_in_progress && world.time > scan_completion_time)
 		scan_in_progress = 0
 		updateDialog()

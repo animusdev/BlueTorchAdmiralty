@@ -1,5 +1,5 @@
 /obj/machinery/uniform_vendor
-	name = "uniform Vendor"
+	name = "uniform vendor"
 	desc= "A uniform vendor for utility, service, and dress uniforms."
 	icon = 'icons/obj/vending.dmi'
 	icon_state = "robotics"
@@ -19,6 +19,7 @@
 	var/list/uniforms = list()
 	var/list/selected_outfit = list()
 	var/static/decl/hierarchy/mil_uniform/mil_uniforms
+	var/global/list/issued_items = list()
 
 /obj/machinery/uniform_vendor/attack_hand(mob/user)
 	if(..())
@@ -41,8 +42,10 @@
 					var/obj/item/clothing/C = piece
 					if(piece in selected_outfit)
 						dat += "<span class='linkOn'>[sanitize(initial(C.name))]</span><a href='byond://?src=\ref[src];rem=[piece]'>X</a>"
-					else
+					else if (can_issue(C))
 						dat += "<a href='byond://?src=\ref[src];add=[piece]'>[sanitize(initial(C.name))]</a>"
+					else
+						dat += "[sanitize(initial(C.name))] (ISSUED)"
 			dat += "<hr>"
 		dat += "<a href='byond://?src=\ref[src];vend=[1]'>Dispense</a>"
 	dat = jointext(dat,"<br>")
@@ -69,7 +72,11 @@
 				M.drop_from_inventory(I,src)
 		. = 1
 	if(href_list["get_all"])
-		selected_outfit |= uniforms[href_list["get_all"]]
+		var/list/addition = uniforms[href_list["get_all"]]
+		for(var/G in addition)
+			if(!can_issue(G))
+				addition -= G
+		selected_outfit |= addition
 		. = 1
 	if(href_list["add"])
 		selected_outfit |= text2path(href_list["add"])
@@ -86,16 +93,21 @@
 
 /obj/machinery/uniform_vendor/attackby(obj/item/weapon/W as obj, mob/user as mob)
 
-	var/obj/item/weapon/card/id/I = W.GetIdCard()
-	if(I && !ID)
-		to_chat(user, "<span class='notice'>You slide [I.registered_name]'s ID into \the [src]!</span>")
-		ID = I
-		user.drop_from_inventory(I,src)
+	if(istype(W, /obj/item/weapon/clothingbag))
+		if(W.contents.len)
+			to_chat(user, "<span class='notice'>You must empty \the [W] before you can put it in \the [src].</span>")
+			return
+		to_chat(user, "<span class='notice'>You put \the [W] into \the [src]'s recycling slot.</span>")
+		qdel(W)
+		return
 
-	if(istype(I, /obj/item/weapon/clothingbag))
-		to_chat(user, "<span class='notice'>You put [I] into \the [src] recycling slot.</span>")
-		qdel(I)
-
+	if(!istype(W, /obj/item/weapon/card/id))
+		to_chat(user, "<span class='notice'>You must use your ID card!</span>")
+		return
+	if(!ID)
+		to_chat(user, "<span class='notice'>You slide \the [W] into \the [src]!</span>")
+		ID = W
+		user.drop_from_inventory(W,src)
 
 /*	Outfit structures
 	branch
@@ -159,6 +171,7 @@
 
 	res["Service"] = list(
 		user_outfit.service_under,
+		user_outfit.service_skirt,
 		user_outfit.service_over,
 		user_outfit.service_shoes,
 		user_outfit.service_hat,
@@ -182,33 +195,28 @@
 
 /obj/machinery/uniform_vendor/proc/spawn_uniform(var/list/selected_outfit)
 	listclearnulls(selected_outfit)
+	if(!issued_items[user_id()])
+		issued_items[user_id()] = list()
+	var/list/checkedout = issued_items[user_id()]
 	if(selected_outfit.len > 1)
 		var/obj/item/weapon/clothingbag/bag = new /obj/item/weapon/clothingbag
 		for(var/item in selected_outfit)
 			new item(bag)
+			checkedout += item
 		bag.forceMove(get_turf(src))
 	else if (selected_outfit.len)
 		var/obj/item/clothing/C = selected_outfit[1]
 		new C(get_turf(src))
+		checkedout += C
 
-
-
-/obj/item/weapon/clothingbag
-	name = "clothing bag"
-	desc = "A cheap plastic bag that contains a fresh set of clothes."
-	icon = 'icons/obj/trash.dmi'
-	icon_state = "trashbag3"
-
-	var/icon_used = "trashbag0"
-	var/opened = 0
-
-/obj/item/weapon/clothingbag/attack_self(mob/user as mob)
-	if(!opened)
-		user.visible_message("<span class='notice'>\The [user] tears open \the [src.name]!</span>", "<span class='notice'>You tear open \the [src.name]!</span>")
-		opened = 1
-		icon_state = icon_used
-		for(var/obj/item in contents)
-			item.forceMove(get_turf(src))
+/obj/machinery/uniform_vendor/proc/user_id()
+	if(!ID)
+		return "UNKNOWN"
 	else
-		to_chat(user, "<span class='warning'>\The [src.name] is already ripped open and is now completely useless!</span>")
+		return "[ID.registered_name], [ID.military_rank], [ID.military_branch]"
 
+/obj/machinery/uniform_vendor/proc/can_issue(var/gear)
+	var/list/issued = issued_items[user_id()]
+	if(!issued || !issued.len)
+		return TRUE
+	return !(gear in issued)

@@ -19,7 +19,7 @@
 	use_power = 0	//Draws directly from power net. Does not use APC power.
 	active_power_usage = 1200
 
-/obj/machinery/shieldwallgen/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = default_state)
+/obj/machinery/shieldwallgen/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/datum/topic_state/state = GLOB.default_state)
 	var/list/data = list()
 	data["draw"] = round(power_draw)
 	data["power"] = round(storedpower)
@@ -27,7 +27,7 @@
 	data["current_draw"] = ((between(500, max_stored_power - storedpower, power_draw)) + power ? active_power_usage : 0)
 	data["online"] = active == 2 ? 1 : 0
 
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "shield.tmpl", "Shielding", 800, 500, state = state)
 		ui.set_initial_data(data)
@@ -118,7 +118,7 @@
 	power = 1	// IVE GOT THE POWER!
 	return 1
 
-/obj/machinery/shieldwallgen/process()
+/obj/machinery/shieldwallgen/Process()
 	power = 0
 	if(!(stat & BROKEN))
 		power()
@@ -198,7 +198,7 @@
 
 
 /obj/machinery/shieldwallgen/attackby(obj/item/W, mob/user)
-	if(istype(W, /obj/item/weapon/wrench))
+	if(isWrench(W))
 		if(active)
 			to_chat(user, "Turn off the field generator first.")
 			return
@@ -247,11 +247,11 @@
 				break
 
 /obj/machinery/shieldwallgen/Destroy()
-	src.cleanup(1)
-	src.cleanup(2)
-	src.cleanup(4)
-	src.cleanup(8)
-	..()
+	src.cleanup(NORTH)
+	src.cleanup(SOUTH)
+	src.cleanup(EAST)
+	src.cleanup(WEST)
+	. = ..()
 
 
 //////////////Containment Field START
@@ -303,7 +303,7 @@
 	user.do_attack_animation(src)
 	playsound(loc, 'sound/weapons/smash.ogg', 75, 1)
 
-/obj/machinery/shieldwall/process()
+/obj/machinery/shieldwall/Process()
 	if(needs_power)
 		if(isnull(gen_primary)||isnull(gen_secondary))
 			qdel(src)
@@ -355,6 +355,6 @@
 	anchored = 1
 	active = 1
 
-/obj/machinery/shieldwallgen/online/initialize()
+/obj/machinery/shieldwallgen/online/Initialize()
 	storedpower = max_stored_power
-	..()
+	. = ..()

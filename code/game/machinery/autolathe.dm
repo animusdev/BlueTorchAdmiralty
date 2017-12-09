@@ -7,6 +7,8 @@
 	use_power = 1
 	idle_power_usage = 10
 	active_power_usage = 2000
+	clicksound = "keyboard"
+	clickvol = 30
 
 	var/list/machine_recipes
 	var/list/stored_material =  list(DEFAULT_WALL_MATERIAL = 0, "glass" = 0)
@@ -37,7 +39,7 @@
 	component_parts += new /obj/item/weapon/stock_parts/manipulator(src)
 	component_parts += new /obj/item/weapon/stock_parts/console_screen(src)
 	RefreshParts()
-	
+
 /obj/machinery/autolathe/Destroy()
 	qdel(wires)
 	wires = null
@@ -100,6 +102,9 @@
 				material_string += ".<br></td>"
 				//Build list of multipliers for sheets.
 				if(R.is_stack)
+					var/obj/item/stack/R_stack = R.path
+					max_sheets = min(max_sheets, initial(R_stack.max_amount))
+					//do not allow lathe to print more sheets than the max amount that can fit in one stack
 					if(max_sheets && max_sheets > 0)
 						multiplier_string  += "<br>"
 						for(var/i = 5;i<max_sheets;i*=2) //5,10,20,40...
@@ -138,7 +143,7 @@
 
 	if(panel_open)
 		//Don't eat multitools or wirecutters used on an open lathe.
-		if(istype(O, /obj/item/device/multitool) || istype(O, /obj/item/weapon/wirecutters))
+		if(isMultitool(O) || isWirecutter(O))
 			attack_hand(user)
 			return
 
@@ -271,6 +276,7 @@
 		if(multiplier > 1 && istype(I, /obj/item/stack))
 			var/obj/item/stack/S = I
 			S.amount = multiplier
+			S.update_icon()
 
 	updateUsrDialog()
 

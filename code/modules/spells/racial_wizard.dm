@@ -9,8 +9,13 @@
 	throw_speed = 1
 	throw_range = 3
 	force = 15
-	var/list/potentials = list(SPECIES_RESOMI = /spell/aoe_turf/conjure/summon/resomi, SPECIES_HUMAN = /obj/item/weapon/storage/bag/cash/infinite, SPECIES_VOX = /spell/targeted/shapeshift/true_form,
-		SPECIES_TAJARA = /spell/messa_shroud, SPECIES_UNATHI = /spell/moghes_blessing, SPECIES_DIONA = /spell/aoe_turf/conjure/grove/gestalt, SPECIES_SKRELL = /obj/item/weapon/contract/apprentice/skrell,
+	var/list/potentials = list(
+		SPECIES_HUMAN = /obj/item/weapon/storage/bag/cash/infinite,
+		SPECIES_VOX = /spell/targeted/shapeshift/true_form,
+		SPECIES_TAJARA = /spell/messa_shroud,
+		SPECIES_UNATHI = /spell/moghes_blessing,
+		SPECIES_DIONA = /spell/aoe_turf/conjure/grove/gestalt,
+		SPECIES_SKRELL = /obj/item/weapon/contract/apprentice/skrell,
 		SPECIES_IPC = /spell/camera_connection)
 
 /obj/item/weapon/magic_rock/attack_self(mob/user)
@@ -35,44 +40,8 @@
 	to_chat(user, "\The [src] crumbles in your hands.")
 	qdel(src)
 
-//RESOMI
-/spell/aoe_turf/conjure/summon/resomi
-	name = "Summon Nano Machines"
-	desc = "This spell summons nano machines from the wizard's body to help them."
-
-	school = "racial"
-	spell_flags = Z2NOCAST
-	invocation_type = SpI_EMOTE
-	invocation = "spasms a moment as nanomachines come out of a port on their back!"
-
-	level_max = list(Sp_TOTAL = 0, Sp_SPEED = 0, Sp_POWER = 0)
-
-	name_summon = 1
-
-	charge_type = Sp_HOLDVAR
-	holder_var_type = "shock_stage"
-	holder_var_amount = 15
-
-	hud_state = "wiz_resomi"
-
-	summon_amt = 1
-	summon_type = list(/mob/living/simple_animal/hostile/commanded/nanomachine)
-
-/spell/aoe_turf/conjure/summon/resomi/before_cast()
-	..()
-	newVars["master"] = holder
-
-/spell/aoe_turf/conjure/summon/resomi/take_charge(mob/user = user, var/skipcharge)
-	. = ..()
-	var/mob/living/carbon/human/H = user
-	if(H && H.shock_stage >= 30)
-		H.visible_message("<b>[user]</b> drops to the floor, thrashing wildly while foam comes from their mouth.")
-		H.Paralyse(20)
-		H.adjustBrainLoss(10)
-
 /obj/item/weapon/storage/bag/cash/infinite
 	startswith = list(/obj/item/weapon/spacecash/bundle/c1000 = 1)
-
 
 //HUMAN
 /obj/item/weapon/storage/bag/cash/infinite/remove_from_storage(obj/item/W as obj, atom/new_location)
@@ -111,8 +80,7 @@
 		return
 
 	var/obj/O = new /obj(T)
-	playsound(T,cast_sound,50,1)
-	O.set_light(range, -10, "#FFFFFF")
+	O.set_light(range, -10, "#ffffff")
 
 	spawn(duration)
 		qdel(O)
@@ -256,11 +224,12 @@
 
 	spell_flags = Z2NOCAST
 	hud_state = "wiz_IPC"
-	var/mob/observer/eye/wizard_eye/vision
+	var/mob/observer/eye/vision
+	var/eye_type = /mob/observer/eye/wizard_eye
 
 /spell/camera_connection/New()
 	..()
-	vision = new(src)
+	vision = new eye_type(src)
 
 /spell/camera_connection/Destroy()
 	qdel(vision)
@@ -277,7 +246,15 @@
 	var/mob/living/L = targets[1]
 
 	vision.possess(L)
+	GLOB.destroyed_event.register(L, src, /spell/camera_connection/proc/release)
+	GLOB.logged_out_event.register(L, src, /spell/camera_connection/proc/release)
 	L.verbs += /mob/living/proc/release_eye
+
+/spell/camera_connection/proc/release(var/mob/living/L)
+	vision.release(L)
+	L.verbs -= /mob/living/proc/release_eye
+	GLOB.destroyed_event.unregister(L, src)
+	GLOB.logged_out_event.unregister(L, src)
 
 /mob/observer/eye/wizard_eye
 	name_sufix = "Wizard Eye"
@@ -296,3 +273,10 @@
 	if(!eyeobj)
 		return
 	eyeobj.release(src)
+
+/mob/observer/eye/wizard_eye/Destroy()
+	if(istype(eyeobj.owner, /mob/living))
+		var/mob/living/L = eyeobj.owner
+		L.release_eye()
+	qdel(eyeobj)
+	return ..()

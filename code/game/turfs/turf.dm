@@ -8,10 +8,7 @@
 	var/holy = 0
 
 	// Initial air contents (in moles)
-	var/oxygen = 0
-	var/carbon_dioxide = 0
-	var/nitrogen = 0
-	var/phoron = 0
+	var/list/initial_gas
 
 	//Properties for airtight tiles (/wall)
 	var/thermal_conductivity = 0.05
@@ -25,9 +22,10 @@
 	var/icon_old = null
 	var/pathweight = 1          // How much does it cost to pathfind over this turf?
 	var/blessed = 0             // Has the turf been blessed?
-	var/dynamic_lighting = 1    // Does the turf use dynamic lighting?
 
 	var/list/decals
+
+	var/movement_delay
 
 /turf/New()
 	..()
@@ -35,23 +33,16 @@
 		spawn( 0 )
 			src.Entered(AM)
 			return
-	turfs |= src
 
 	if(dynamic_lighting)
 		luminosity = 0
 	else
 		luminosity = 1
 
-/turf/proc/initialize()
-	return
-
-/turf/proc/update_icon()
-	return
-
 /turf/Destroy()
-	turfs -= src
 	remove_cleanables()
 	..()
+	return QDEL_HINT_IWILLGC
 
 /turf/ex_act(severity)
 	return 0
@@ -138,11 +129,6 @@ var/const/enterloopsanity = 100
 
 	if(ismob(A))
 		var/mob/M = A
-		var/mob/living/L = A
-		if(istype(L))
-			if(!(L in radiation_repository.irradiated_mobs))
-				if(src in radiation_repository.irradiated_turfs)
-					radiation_repository.irradiated_mobs.Add(L)
 		if(!M.check_solid_ground())
 			inertial_drift(M)
 			//we'll end up checking solid ground again but we still need to check the other things.
@@ -170,6 +156,9 @@ var/const/enterloopsanity = 100
 /turf/proc/is_plating()
 	return 0
 
+/turf/proc/protects_atom(var/atom/A)
+	return FALSE
+
 /turf/proc/inertial_drift(atom/movable/A)
 	if(!(A.last_move))	return
 	if((istype(A, /mob/) && src.x > 2 && src.x < (world.maxx - 1) && src.y > 2 && src.y < (world.maxy-1)))
@@ -190,7 +179,7 @@ var/const/enterloopsanity = 100
 
 /turf/proc/AdjacentTurfs(var/check_blockage = TRUE)
 	. = list()
-	for(var/turf/t in oview(src,1))
+	for(var/turf/t in (trange(1,src) - src))
 		if(check_blockage)
 			if(!t.density)
 				if(!LinkBlocked(src, t) && !TurfBlockedNonWindow(t))
@@ -234,7 +223,7 @@ var/const/enterloopsanity = 100
 
 //expects an atom containing the reagents used to clean the turf
 /turf/proc/clean(atom/source, mob/user = null)
-	if(source.reagents.has_reagent("water", 1) || source.reagents.has_reagent("cleaner", 1))
+	if(source.reagents.has_reagent(/datum/reagent/water, 1) || source.reagents.has_reagent(/datum/reagent/space_cleaner, 1))
 		clean_blood()
 		remove_cleanables()
 	else
@@ -253,3 +242,12 @@ var/const/enterloopsanity = 100
 	if(decals && decals.len)
 		decals.Cut()
 		decals = null
+
+// Called when turf is hit by a thrown object
+/turf/hitby(atom/movable/AM as mob|obj, var/speed)
+	if(src.density)
+		spawn(2)
+			step(AM, turn(AM.last_move, 180))
+		if(isliving(AM))
+			var/mob/living/M = AM
+			M.turf_collision(src, speed)

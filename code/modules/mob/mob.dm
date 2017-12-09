@@ -1,9 +1,11 @@
 /mob/Destroy()//This makes sure that mobs with clients/keys are not just deleted from the game.
-	mob_list -= src
-	dead_mob_list_ -= src
-	living_mob_list_ -= src
+	STOP_PROCESSING(SSmobs, src)
+	GLOB.dead_mob_list_ -= src
+	GLOB.living_mob_list_ -= src
 	unset_machine()
-	qdel(hud_used)
+	QDEL_NULL(hud_used)
+	for(var/obj/item/grab/G in grabbed_by)
+		qdel(G)
 	clear_fullscreen()
 	if(client)
 		remove_screen_obj_references()
@@ -15,7 +17,8 @@
 	if(mind && mind.current == src)
 		spellremove(src)
 	ghostize()
-	. = ..()
+	..()
+	return QDEL_HINT_HARDDEL_NOW
 
 /mob/proc/remove_screen_obj_references()
 	hands = null
@@ -39,9 +42,9 @@
 	ability_master = null
 	zone_sel = null
 
-/mob/New()
-	mob_list += src
-	..()
+/mob/Initialize()
+	. = ..()
+	START_PROCESSING(SSmobs, src)
 
 /mob/proc/show_message(msg, type, alt, alt_type)//Message, type of message (1 or 2), alternative message, alt message type (1 or 2)
 	if(!client)	return
@@ -94,6 +97,9 @@
 		if(blind_message)
 			M.show_message(blind_message, AUDIBLE_MESSAGE)
 			continue
+	//Multiz, have shadow do same
+	if(shadow)
+		shadow.visible_message(message, self_message, blind_message)
 
 // Returns an amount of power drawn from the object (-1 if it's not viable).
 // If drain_check is set it will not actually drain power, just return a value.
@@ -128,13 +134,16 @@
 		O.show_message(message, AUDIBLE_MESSAGE, deaf_message, VISIBLE_MESSAGE)
 
 /mob/proc/findname(msg)
-	for(var/mob/M in mob_list)
-		if (M.real_name == text("[]", msg))
+	for(var/mob/M in SSmobs.mob_list)
+		if (M.real_name == msg)
 			return M
 	return 0
 
 /mob/proc/movement_delay()
 	. = 0
+	if(istype(loc, /turf))
+		var/turf/T = loc
+		. += T.movement_delay
 	if(pulling)
 		if(istype(pulling, /obj))
 			var/obj/O = pulling
@@ -177,7 +186,7 @@
 	if ((incapacitation_flags & INCAPACITATION_STUNNED) && stunned)
 		return 1
 
-	if ((incapacitation_flags & INCAPACITATION_FORCELYING) && (weakened || resting))
+	if ((incapacitation_flags & INCAPACITATION_FORCELYING) && (weakened || resting || pinned.len))
 		return 1
 
 	if ((incapacitation_flags & INCAPACITATION_KNOCKOUT) && (stat || paralysis || sleeping || (status_flags & FAKEDEATH)))
@@ -247,7 +256,7 @@
 		return 0
 
 	var/obj/P = new /obj/effect/decal/point(tile)
-	P.invisibility = invisibility
+	P.set_invisibility(invisibility)
 	spawn (20)
 		if(P)
 			qdel(P)	// qdel
@@ -257,13 +266,13 @@
 
 //Gets the mob grab conga line.
 /mob/proc/ret_grab(list/L)
-	if (!istype(l_hand, /obj/item/weapon/grab) && !istype(r_hand, /obj/item/weapon/grab))
+	if (!istype(l_hand, /obj/item/grab) && !istype(r_hand, /obj/item/grab))
 		return L
 	if (!L)
 		L = list(src)
 	for(var/A in list(l_hand,r_hand))
-		if (istype(A, /obj/item/weapon/grab))
-			var/obj/item/weapon/grab/G = A
+		if (istype(A, /obj/item/grab))
+			var/obj/item/grab/G = A
 			if (!(G.affecting in L))
 				L += G.affecting
 				if (G.affecting)
@@ -335,7 +344,7 @@
 	set src in usr
 	if(usr != src)
 		to_chat(usr, "No.")
-	var/msg = sanitize(input(usr,"Set the flavor text in your 'examine' verb. Can also be used for OOC notes about your character.","Flavor Text",rhtml_decode(flavor_text)) as message|null, extra = 0)
+	var/msg = sanitize(input(usr,"Set the flavor text in your 'examine' verb. Can also be used for OOC notes about your character.","Flavor Text",html_decode(flavor_text)) as message|null, extra = 0)
 
 	if(msg != null)
 		flavor_text = msg
@@ -432,7 +441,7 @@
 				namecounts[name] = 1
 			creatures[name] = O
 
-	for(var/mob/M in sortAtom(mob_list))
+	for(var/mob/M in sortAtom(SSmobs.mob_list))
 		var/name = M.name
 		if (names.Find(name))
 			namecounts[name]++
@@ -476,25 +485,29 @@
 		src << browse(null, t1)
 
 	if(href_list["flavor_more"])
-		usr << browse(text("<HTML><HEAD><TITLE>[]</TITLE></HEAD><BODY><TT>[]</TT></BODY></HTML>", name, cp1251_to_utf8(replacetext(flavor_text, "\n", "<BR>"))), text("window=[];size=500x200", name))
+		usr << browse(text("<HTML><HEAD><TITLE>[]</TITLE></HEAD><BODY><TT>[]</TT></BODY></HTML>", name, replacetext(flavor_text, "\n", "<BR>")), text("window=[];size=500x200", name))
 		onclose(usr, "[name]")
 	if(href_list["flavor_change"])
 		update_flavor_text()
+
 //	..()
 	return
 
-
 /mob/proc/pull_damage()
-	if(ishuman(src))
-		var/mob/living/carbon/human/H = src
-		if(H.health - H.getHalLoss() <= config.health_threshold_softcrit)
-			for(var/name in H.organs_by_name)
-				var/obj/item/organ/external/e = H.organs_by_name[name]
-				if(e && H.lying)
-					if((((e.status & ORGAN_BROKEN) && !e.splinted) || e.status & ORGAN_BLEEDING ) && (H.getBruteLoss() + H.getFireLoss() >= 100))
-						return 1
-						break
+	return 0
+
+/mob/living/carbon/human/pull_damage()
+	if(!lying || getBruteLoss() + getFireLoss() < 100)
 		return 0
+	for(var/thing in organs)
+		var/obj/item/organ/external/e = thing
+		if(!e || e.is_stump())
+			continue
+		if((e.status & ORGAN_BROKEN) && !e.splinted)
+			return 1
+		if(e.status & ORGAN_BLEEDING)
+			return 1
+	return 0
 
 /mob/MouseDrop(mob/M as mob)
 	..()
@@ -620,14 +633,26 @@
 			stat("Round Duration", roundduration2text())
 		if(client.holder || isghost(client.mob))
 			stat("Location:", "([x], [y], [z]) [loc]")
-		if(client.holder)
+
+	if(client.holder)
+		if(statpanel("Processes") && processScheduler)
+			processScheduler.statProcesses()
+		if(statpanel("MC"))
 			stat("CPU:","[world.cpu]")
 			stat("Instances:","[world.contents.len]")
-
-	if(client.holder && statpanel("Processes"))
-		if(processScheduler)
-			processScheduler.statProcesses()
-		sleep(1 SECOND)
+			stat(null)
+			if(Master)
+				Master.stat_entry()
+			else
+				stat("Master Controller:", "ERROR")
+			if(Failsafe)
+				Failsafe.stat_entry()
+			else
+				stat("Failsafe Controller:", "ERROR")
+			if(Master)
+				stat(null)
+				for(var/datum/controller/subsystem/SS in Master.subsystems)
+					SS.stat_entry()
 
 	if(listed_turf && client)
 		if(!TurfAdjacent(listed_turf))
@@ -685,10 +710,12 @@
 		set_density(initial(density))
 	reset_layer()
 
-	for(var/obj/item/weapon/grab/G in grabbed_by)
-		if(G.state >= GRAB_AGGRESSIVE)
+	for(var/obj/item/grab/G in grabbed_by)
+		if(G.stop_move())
 			canmove = 0
-			break
+
+		if(G.force_stand())
+			lying = 0
 
 	//Temporarily moved here from the various life() procs
 	//I'm fixing stuff incrementally so this will likely find a better home.
@@ -937,7 +964,7 @@ mob/proc/yank_out_object()
 
 	return 0
 
-/mob/proc/updateicon()
+/mob/update_icon()
 	return
 
 /mob/verb/face_direction()

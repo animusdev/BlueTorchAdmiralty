@@ -37,6 +37,8 @@
 	// turf animation
 	var/atom/movable/overlay/c_animation = null
 
+	atmos_canpass = CANPASS_PROC
+
 /obj/machinery/door/attack_generic(var/mob/user, var/damage)
 	if(damage >= 10)
 		visible_message("<span class='danger'>\The [user] smashes into \the [src]!</span>")
@@ -73,10 +75,9 @@
 /obj/machinery/door/Destroy()
 	set_density(0)
 	update_nearby_tiles()
-	..()
-	return
+	. = ..()
 
-/obj/machinery/door/process()
+/obj/machinery/door/Process()
 	if(close_door_at && world.time >= close_door_at)
 		if(autoclose)
 			close_door_at = next_close_time()
@@ -220,17 +221,18 @@
 			if (!transfer)
 				to_chat(user, "<span class='warning'>You must weld or remove \the [repairing] from \the [src] before you can add anything else.</span>")
 		else
-			repairing = stack.split(amount_needed)
+			repairing = stack.split(amount_needed, force=TRUE)
 			if (repairing)
 				repairing.loc = src
 				transfer = repairing.amount
+				repairing.uses_charge = FALSE //for clean robot door repair - stacks hint immortal if true
 
 		if (transfer)
 			to_chat(user, "<span class='notice'>You fit [transfer] [stack.singular_name]\s to damaged and broken parts on \the [src].</span>")
 
 		return
 
-	if(repairing && istype(I, /obj/item/weapon/weldingtool))
+	if(repairing && isWelder(I))
 		if(!density)
 			to_chat(user, "<span class='warning'>\The [src] must be closed before you can repair it.</span>")
 			return
@@ -247,7 +249,7 @@
 				repairing = null
 		return
 
-	if(repairing && istype(I, /obj/item/weapon/crowbar))
+	if(repairing && isCrowbar(I))
 		to_chat(user, "<span class='notice'>You remove \the [repairing].</span>")
 		playsound(src.loc, 'sound/items/Crowbar.ogg', 100, 1)
 		repairing.loc = user.loc
@@ -346,8 +348,7 @@
 		icon_state = "door1"
 	else
 		icon_state = "door0"
-	var/turf/T = get_turf(src)
-	T.calc_rad_resistance()
+	radiation_repository.resistance_cache.Remove(get_turf(src))
 	return
 
 
@@ -432,13 +433,10 @@
 	return ..(M)
 
 /obj/machinery/door/update_nearby_tiles(need_rebuild)
-	if(!air_master)
-		return 0
-
+	. = ..()
 	for(var/turf/simulated/turf in locs)
 		update_heat_protection(turf)
-		air_master.mark_for_update(turf)
-
+		SSair.mark_for_update(turf)
 	return 1
 
 /obj/machinery/door/proc/update_heat_protection(var/turf/simulated/source)

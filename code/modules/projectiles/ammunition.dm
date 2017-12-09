@@ -24,7 +24,7 @@
 /obj/item/ammo_casing/proc/expend()
 	. = BB
 	BB = null
-	set_dir(pick(alldirs)) //spin spent casings
+	set_dir(pick(GLOB.alldirs)) //spin spent casings
 
 	// Aurora forensics port, gunpowder residue.
 	if(leaves_residue)
@@ -47,7 +47,7 @@
 			H.gunshot_residue = caliber
 
 /obj/item/ammo_casing/attackby(obj/item/weapon/W as obj, mob/user as mob)
-	if(istype(W, /obj/item/weapon/screwdriver))
+	if(isScrewdriver(W))
 		if(!BB)
 			to_chat(user, "<span class='notice'>There is no bullet in the casing to inscribe anything into.</span>")
 			return
@@ -144,7 +144,7 @@
 	to_chat(user, "<span class='notice'>You empty [src].</span>")
 	for(var/obj/item/ammo_casing/C in stored_ammo)
 		C.forceMove(user.loc)
-		C.set_dir(pick(alldirs))
+		C.set_dir(pick(GLOB.alldirs))
 	stored_ammo.Cut()
 	update_icon()
 

@@ -2,6 +2,8 @@
 	name = "chemical dispenser"
 	icon = 'icons/obj/chemical.dmi'
 	icon_state = "dispenser"
+	clicksound = "button"
+	clickvol = 20
 
 	var/list/spawn_cartridges = null // Set to a list of types to spawn one of each on New()
 
@@ -58,18 +60,18 @@
 	C.loc = src
 	cartridges[C.label] = C
 	cartridges = sortAssoc(cartridges)
-	nanomanager.update_uis(src)
+	GLOB.nanomanager.update_uis(src)
 
 /obj/machinery/chemical_dispenser/proc/remove_cartridge(label)
 	. = cartridges[label]
 	cartridges -= label
-	nanomanager.update_uis(src)
+	GLOB.nanomanager.update_uis(src)
 
 /obj/machinery/chemical_dispenser/attackby(obj/item/weapon/W, mob/user)
 	if(istype(W, /obj/item/weapon/reagent_containers/chem_disp_cartridge))
 		add_cartridge(W, user)
 
-	else if(istype(W, /obj/item/weapon/screwdriver))
+	else if(isScrewdriver(W))
 		var/label = input(user, "Which cartridge would you like to remove?", "Chemical Dispenser") as null|anything in cartridges
 		if(!label) return
 		var/obj/item/weapon/reagent_containers/chem_disp_cartridge/C = remove_cartridge(label)
@@ -95,8 +97,9 @@
 		container =  RC
 		user.drop_from_inventory(RC)
 		RC.loc = src
+		update_icon()
 		to_chat(user, "<span class='notice'>You set \the [RC] on \the [src].</span>")
-		nanomanager.update_uis(src) // update all UIs attached to src
+		GLOB.nanomanager.update_uis(src) // update all UIs attached to src
 
 	else
 		..()
@@ -128,7 +131,7 @@
 	data["chemicals"] = chemicals
 
 	// update the ui if it exists, returns null if no ui is passed/found
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if(!ui)
 		ui = new(user, src, ui_key, "chem_disp.tmpl", ui_title, 390, 680)
 		ui.set_initial_data(data)
@@ -153,6 +156,7 @@
 			var/obj/item/weapon/reagent_containers/B = container
 			B.loc = loc
 			container = null
+			update_icon()
 
 	add_fingerprint(usr)
 	return 1 // update UIs attached to this object
@@ -162,3 +166,11 @@
 
 /obj/machinery/chemical_dispenser/attack_hand(mob/user as mob)
 	ui_interact(user)
+
+/obj/machinery/chemical_dispenser/update_icon()
+	overlays.Cut()
+	if(container)
+		var/mutable_appearance/beaker_overlay
+		beaker_overlay = image('icons/obj/chemical.dmi', src, "lil_beaker")
+		beaker_overlay.pixel_x = rand(-10, 5)
+		overlays += beaker_overlay

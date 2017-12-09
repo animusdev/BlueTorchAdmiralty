@@ -15,8 +15,36 @@
 	pull_mask = 1
 
 /obj/item/clothing/mask/breath/medical
-	desc = "A close-fitting sterile mask that can be connected to an air supply."
+	desc = "A close-fitting sterile mask that can be manually connected to an air supply for treatment."
 	name = "medical mask"
 	icon_state = "medical"
 	item_state = "medical"
 	permeability_coefficient = 0.01
+
+/obj/item/clothing/mask/breath/anesthetic
+	desc = "A close-fitting sterile mask that is used by the anesthetic wallmounted pump."
+	name = "anesthetic mask"
+	icon_state = "medical"
+	item_state = "medical"
+	permeability_coefficient = 0.01
+	
+/obj/item/clothing/mask/breath/emergency
+	desc = "A close-fitting  mask that is used by the wallmounted emergency oxygen pump."
+	name = "emergency mask"
+	icon_state = "breath"
+	item_state = "breath"
+	permeability_coefficient = 0.50
+
+/obj/item/clothing/mask/breath/bogani
+	name = "large alien mask"
+	desc = "Some form of alien breathing apparatus."
+	icon_state = "bmask_large"
+	item_state = "bmask_large"
+	pull_mask = 0
+	species_restricted = list(SPECIES_BOGANI)
+
+/obj/item/clothing/mask/breath/bogani/egyno
+	name = "alien mask"
+	icon_state = "bmask"
+	item_state = "bmask"
+	species_restricted = list(SPECIES_EGYNO)

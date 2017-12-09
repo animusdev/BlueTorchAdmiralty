@@ -23,19 +23,14 @@
 
 
 /obj/item/weapon/flamethrower/Destroy()
-	if(weldtool)
-		qdel(weldtool)
-	if(igniter)
-		qdel(igniter)
-	if(ptank)
-		qdel(ptank)
-	..()
-	return
+	QDEL_NULL(weldtool)
+	QDEL_NULL(igniter)
+	QDEL_NULL(ptank)
+	. = ..()
 
-
-/obj/item/weapon/flamethrower/process()
+/obj/item/weapon/flamethrower/Process()
 	if(!lit)
-		processing_objects.Remove(src)
+		STOP_PROCESSING(SSobj, src)
 		return null
 	var/turf/location = loc
 	if(istype(location, /mob/))
@@ -61,9 +56,11 @@
 	return
 
 /obj/item/weapon/flamethrower/afterattack(atom/target, mob/user, proximity)
-	if(!proximity) return
 	// Make sure our user is still holding us
 	if(user && user.get_active_hand() == src)
+		if(user.a_intent == I_HELP) //don't shoot if we're on help intent
+			to_chat(user, "<span class='warning'>You refrain from firing \the [src] as your intent is set to help.</span>")
+			return
 		var/turf/target_turf = get_turf(target)
 		if(target_turf)
 			var/turflist = getline(user, target_turf)
@@ -71,7 +68,7 @@
 
 /obj/item/weapon/flamethrower/attackby(obj/item/W as obj, mob/user as mob)
 	if(user.stat || user.restrained() || user.lying)	return
-	if(iswrench(W) && !status)//Taking this apart
+	if(isWrench(W) && !status)//Taking this apart
 		var/turf/T = get_turf(src)
 		if(weldtool)
 			weldtool.loc = T
@@ -86,7 +83,7 @@
 		qdel(src)
 		return
 
-	if(isscrewdriver(W) && igniter && !lit)
+	if(isScrewdriver(W) && igniter && !lit)
 		status = !status
 		to_chat(user, "<span class='notice'>[igniter] is now [status ? "secured" : "unsecured"]!</span>")
 		update_icon()
@@ -148,7 +145,7 @@
 		if(!status)	return
 		lit = !lit
 		if(lit)
-			processing_objects.Add(src)
+			START_PROCESSING(SSobj, src)
 	if(href_list["amount"])
 		throw_amount = throw_amount + text2num(href_list["amount"])
 		throw_amount = max(50, min(5000, throw_amount))

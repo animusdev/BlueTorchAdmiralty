@@ -13,11 +13,11 @@
 
 /datum/talking_atom/proc/init()
 	if(holder_atom)
-		processing_objects.Add(src)
+		START_PROCESSING(SSprocessing, src)
 
-/datum/talking_atom/proc/process()
+/datum/talking_atom/Process()
 	if(!holder_atom)
-		processing_objects.Remove(src)
+		STOP_PROCESSING(SSprocessing, src)
 
 	else if(heard_words.len >= 1 && world.time > last_talk_time + talk_interval && prob(talk_chance))
 		SaySomething()
@@ -43,11 +43,11 @@
 		var/next = Xa + 1
 		if(heard_words.len > 20 + rand(10,20))
 			heard_words.Remove(heard_words[1])
-		if(!heard_words["[rlowertext(seperate[Xa])]"])
-			heard_words["[rlowertext(seperate[Xa])]"] = list()
-		var/list/w = heard_words["[rlowertext(seperate[Xa])]"]
+		if(!heard_words["[lowertext(seperate[Xa])]"])
+			heard_words["[lowertext(seperate[Xa])]"] = list()
+		var/list/w = heard_words["[lowertext(seperate[Xa])]"]
 		if(w)
-			w.Add("[rlowertext(seperate[next])]")
+			w.Add("[lowertext(seperate[next])]")
 //		log_debug("Adding [lowertext(seperate[next])] to [lowertext(seperate[Xa])]")
 
 	if(prob(30))
@@ -80,10 +80,10 @@
 	else
 		text = pick(splittext(word, " "))
 	if(lentext(text)==1)
-		text=ruppertext(text)
+		text=uppertext(text)
 	else
 		var/cap = copytext(text,1,2)
-		cap = ruppertext(cap)
+		cap = uppertext(cap)
 		cap += copytext(text,2,lentext(text)+1)
 		text=cap
 	var/q = 0
@@ -91,7 +91,7 @@
 	if(msg=="What" | msg == "Who" | msg == "How" | msg == "Why" | msg == "Are")
 		q=1
 
-	text=rlowertext(text)
+	text=lowertext(text)
 	for(var/ya,ya <= limit,ya++)
 
 		if(heard_words.Find("[text]"))
@@ -109,12 +109,12 @@
 			msg+="!"
 
 	var/list/listening = viewers(holder_atom)
-	for(var/mob/M in mob_list)
+	for(var/mob/M in SSmobs.mob_list)
 		if (!M.client)
 			continue //skip monkeys and leavers
 		if (istype(M, /mob/new_player))
 			continue
-		if(M.stat == DEAD && M.is_preference_enabled(/datum/client_preference/ghost_ears))
+		if(M.stat == DEAD && M.get_preference_value(/datum/client_preference/ghost_ears) == GLOB.PREF_ALL_SPEECH)
 			listening|=M
 
 	for(var/mob/M in listening)

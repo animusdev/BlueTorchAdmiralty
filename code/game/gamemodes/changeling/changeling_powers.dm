@@ -145,7 +145,7 @@ var/global/list/possible_changeling_IDs = list("Alpha","Beta","Gamma","Delta","E
 	var/datum/changeling/changeling = changeling_power(0,0,100)
 	if(!changeling)	return
 
-	var/obj/item/weapon/grab/G = src.get_active_hand()
+	var/obj/item/grab/G = src.get_active_hand()
 	if(!istype(G))
 		to_chat(src, "<span class='warning'>We must be grabbing a creature in our active hand to absorb them.</span>")
 		return
@@ -163,7 +163,7 @@ var/global/list/possible_changeling_IDs = list("Alpha","Beta","Gamma","Delta","E
 		to_chat(src, "<span class='warning'>This creature's DNA is ruined beyond useability!</span>")
 		return
 
-	if(G.state != GRAB_KILL)
+	if(!G.can_absorb())
 		to_chat(src, "<span class='warning'>We must have a tighter grip to absorb this creature.</span>")
 		return
 
@@ -210,6 +210,10 @@ var/global/list/possible_changeling_IDs = list("Alpha","Beta","Gamma","Delta","E
 
 	var/datum/absorbed_dna/newDNA = new(T.real_name, T.dna, T.species.name, T.languages)
 	absorbDNA(newDNA)
+	if(mind && T.mind)
+		mind.store_memory("[T.real_name]'s memories:")
+		mind.store_memory(T.mind.memory)
+		mind.store_memory("<hr>")
 
 	if(T.mind && T.mind.changeling)
 		if(T.mind.changeling.absorbed_dna)
@@ -268,6 +272,18 @@ var/global/list/possible_changeling_IDs = list("Alpha","Beta","Gamma","Delta","E
 	changeling.chem_charges -= 5
 	changeling.geneticdamage = 30
 
+	var/S_name = chosen_dna.speciesName
+	var/datum/species/S_dat = all_species[S_name]
+	var/changeTime = 2 SECONDS
+	if(mob_size != S_dat.mob_size)
+		src.visible_message("<span class='warning'>[src]'s body begins to twist, their mass changing rapidly!</span>")
+		changeTime = 8 SECONDS
+	else
+		src.visible_message("<span class='warning'>[src]'s body begins to twist, changing rapidly!</span>")
+
+	if(!do_after(src, changeTime))
+		to_chat(src, "<span class='notice'>You fail to change shape.</span>")
+		return
 	handle_changeling_transform(chosen_dna)
 
 	src.verbs -= /mob/proc/changeling_transform
@@ -357,7 +373,7 @@ var/global/list/possible_changeling_IDs = list("Alpha","Beta","Gamma","Delta","E
 	C.canmove = 0
 	C.icon = null
 	C.overlays.Cut()
-	C.invisibility = 101
+	C.set_invisibility(101)
 	var/atom/movable/overlay/animation = new /atom/movable/overlay( C.loc )
 	animation.icon_state = "blank"
 	animation.icon = 'icons/mob/mob.dmi'
@@ -707,7 +723,7 @@ var/list/datum/absorbed_dna/hivemind_bank = list()
 	var/mob/living/carbon/human/T = changeling_sting(15,/mob/proc/changeling_lsdsting)
 	if(!T)	return 0
 	spawn(rand(300,600))
-		if(T)	T.hallucination += 400
+		if(T)	T.hallucination(400, 80)
 	feedback_add_details("changeling_powers","HS")
 	return 1
 
@@ -750,50 +766,6 @@ var/list/datum/absorbed_dna/hivemind_bank = list()
 	feedback_add_details("changeling_powers","DS")
 	return 1
 
-/mob/proc/changeling_paralysis_sting()
-	set category = "Changeling"
-	set name = "Paralysis sting (30)"
-	set desc="Sting target"
-
-	var/mob/living/carbon/human/T = changeling_sting(30,/mob/proc/changeling_paralysis_sting)
-	if(!T)	return 0
-	to_chat(T, "<span class='danger'>Your muscles begin to painfully tighten.</span>")
-	T.Weaken(20)
-	feedback_add_details("changeling_powers","PS")
-	return 1
-
-/mob/proc/changeling_transformation_sting()
-	set category = "Changeling"
-	set name = "Transformation sting (40)"
-	set desc="Sting target"
-
-	var/datum/changeling/changeling = changeling_power(40)
-	if(!changeling)	return 0
-
-
-
-	var/list/names = list()
-	for(var/datum/absorbed_dna/DNA in changeling.absorbed_dna)
-		names += "[DNA.name]"
-
-	var/S = input("Select the target DNA: ", "Target DNA", null) as null|anything in names
-	if(!S)	return
-
-	var/datum/absorbed_dna/chosen_dna = changeling.GetDNA(S)
-	if(!chosen_dna)
-		return
-
-	var/mob/living/carbon/human/T = changeling_sting(40,/mob/proc/changeling_transformation_sting)
-	if(!T)	return 0
-	if((HUSK in T.mutations) || (T.species.flags & NO_SCAN))
-		to_chat(src, "<span class='warning'>Our sting appears ineffective against this creature.</span>")
-		return 0
-
-	T.handle_changeling_transform(chosen_dna)
-
-	feedback_add_details("changeling_powers","TS")
-	return 1
-
 /mob/proc/changeling_DEATHsting()
 	set category = "Changeling"
 	set name = "Death Sting (40)"
@@ -803,8 +775,8 @@ var/list/datum/absorbed_dna/hivemind_bank = list()
 	var/mob/living/carbon/human/T = changeling_sting(40,/mob/proc/changeling_DEATHsting,loud)
 	if(!T)	return 0
 	to_chat(T, "<span class='danger'>You feel a small prick and your chest becomes tight.</span>")
-	T.make_jittery(1000)
-	if(T.reagents)	T.reagents.add_reagent("lexorin", 40)
+	T.make_jittery(400)
+	if(T.reagents)	T.reagents.add_reagent(/datum/reagent/lexorin, 40)
 	feedback_add_details("changeling_powers","DTHS")
 	return 1
 

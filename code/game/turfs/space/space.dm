@@ -16,8 +16,8 @@
 	update_starlight()
 	..()
 
-/turf/space/initialize()
-	..()
+/turf/space/Initialize()
+	. = ..()
 	if(!HasBelow(z))
 		return
 	var/turf/below = GetBelow(src)
@@ -29,11 +29,14 @@
 	if(!below.density && istype(below.loc, /area/space))
 		return
 
+	return INITIALIZE_HINT_LATELOAD // oh no! we need to switch to being a different kind of turf!
+
+/turf/space/LateInitialize()
 	// We alter area type before the turf to ensure the turf-change-event-propagation is handled as expected.
-	if(using_map.base_floor_area)
-		var/area/new_area = locate(using_map.base_floor_area) || new using_map.base_floor_area
+	if(GLOB.using_map.base_floor_area)
+		var/area/new_area = locate(GLOB.using_map.base_floor_area) || new GLOB.using_map.base_floor_area
 		new_area.contents.Add(src)
-	ChangeTurf(using_map.base_floor_type)
+	ChangeTurf(GLOB.using_map.base_floor_type)
 
 // override for space turfs, since they should never hide anything
 /turf/space/levelupdate()
@@ -56,7 +59,7 @@
 	if (istype(C, /obj/item/stack/rods))
 		var/obj/structure/lattice/L = locate(/obj/structure/lattice, src)
 		if(L)
-			return
+			return L.attackby(C, user)
 		var/obj/item/stack/rods/R = C
 		if (R.use(1))
 			to_chat(user, "<span class='notice'>Constructing support lattice ...</span>")
@@ -100,7 +103,7 @@
 	var/list/y_arr
 
 	if(src.x <= 1)
-		if(istype(A, /obj/effect/meteor)||istype(A, /obj/effect/space_dust))
+		if(istype(A, /obj/effect/meteor))
 			qdel(A)
 			return
 
@@ -108,8 +111,8 @@
 		if(!cur_pos) return
 		cur_x = cur_pos["x"]
 		cur_y = cur_pos["y"]
-		next_x = (--cur_x||global_map.len)
-		y_arr = global_map[next_x]
+		next_x = (--cur_x||GLOB.global_map.len)
+		y_arr = GLOB.global_map[next_x]
 		target_z = y_arr[cur_y]
 /*
 		//debug
@@ -134,8 +137,8 @@
 		if(!cur_pos) return
 		cur_x = cur_pos["x"]
 		cur_y = cur_pos["y"]
-		next_x = (++cur_x > global_map.len ? 1 : cur_x)
-		y_arr = global_map[next_x]
+		next_x = (++cur_x > GLOB.global_map.len ? 1 : cur_x)
+		y_arr = GLOB.global_map[next_x]
 		target_z = y_arr[cur_y]
 /*
 		//debug
@@ -159,7 +162,7 @@
 		if(!cur_pos) return
 		cur_x = cur_pos["x"]
 		cur_y = cur_pos["y"]
-		y_arr = global_map[cur_x]
+		y_arr = GLOB.global_map[cur_x]
 		next_y = (--cur_y||y_arr.len)
 		target_z = y_arr[next_y]
 /*
@@ -178,14 +181,14 @@
 					A.loc.Entered(A)
 
 	else if (src.y >= world.maxy)
-		if(istype(A, /obj/effect/meteor)||istype(A, /obj/effect/space_dust))
+		if(istype(A, /obj/effect/meteor))
 			qdel(A)
 			return
 		var/list/cur_pos = src.get_global_map_pos()
 		if(!cur_pos) return
 		cur_x = cur_pos["x"]
 		cur_y = cur_pos["y"]
-		y_arr = global_map[cur_x]
+		y_arr = GLOB.global_map[cur_x]
 		next_y = (++cur_y > y_arr.len ? 1 : cur_y)
 		target_z = y_arr[next_y]
 /*

@@ -3,12 +3,6 @@
 #define GAME_STATE_PLAYING		3
 #define GAME_STATE_FINISHED		4
 
-// Security levels.
-#define SEC_LEVEL_GREEN 0
-#define SEC_LEVEL_BLUE  1
-#define SEC_LEVEL_RED   2
-#define SEC_LEVEL_DELTA 3
-
 #define BE_PLANT "BE_PLANT"
 #define BE_SYNTH "BE_SYNTH"
 #define BE_PAI   "BE_PAI"
@@ -42,15 +36,16 @@
 #define MODE_WIZARD "wizard"
 #define MODE_CHANGELING "changeling"
 #define MODE_CULTIST "cultist"
-#define MODE_HIGHLANDER "highlander"
 #define MODE_MONKEY "monkey"
 #define MODE_RENEGADE "renegade"
 #define MODE_REVOLUTIONARY "revolutionary"
 #define MODE_LOYALIST "loyalist"
 #define MODE_MALFUNCTION "malf"
 #define MODE_TRAITOR "traitor"
+#define MODE_DEITY "deity"
+#define MODE_GODCULTIST "god cultist"
 
-#define DEFAULT_TELECRYSTAL_AMOUNT 100
+#define DEFAULT_TELECRYSTAL_AMOUNT 130
 
 /////////////////
 ////WIZARD //////

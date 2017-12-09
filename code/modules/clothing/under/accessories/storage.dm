@@ -2,7 +2,7 @@
 	name = "load bearing equipment"
 	desc = "Used to hold things when you don't have enough hands."
 	icon_state = "webbing"
-	slot = "utility"
+	slot = ACCESSORY_SLOT_UTILITY
 	var/slots = 3
 	var/max_w_class = ITEM_SIZE_SMALL //pocket sized
 	var/obj/item/weapon/storage/internal/pockets/hold
@@ -138,6 +138,15 @@
 		/obj/item/weapon/plastique,
 		/obj/item/clothing/mask/smokable,
 		/obj/item/weapon/screwdriver,
-		/obj/item/device/multitool
+		/obj/item/device/multitool,
+		/obj/item/weapon/magnetic_ammo,
+		/obj/item/ammo_magazine,
+		/obj/item/weapon/net_shell,
+		/obj/item/weapon/reagent_containers/glass/beaker/vial
 	)
 
+/obj/item/clothing/accessory/storage/bandolier/safari/New()
+	..()
+
+	for(var/i = 0, i < slots, i++)
+		new /obj/item/weapon/net_shell(hold)
