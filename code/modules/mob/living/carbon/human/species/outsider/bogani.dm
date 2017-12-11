@@ -49,9 +49,11 @@
 
 	genders = list(NEUTER)
 
+
 /datum/species/bogani/egyno
 	name = SPECIES_EGYNO
 	name_plural = SPECIES_EGYNO
+	spawn_flags = SPECIES_IS_RESTRICTED
 
 	icobase = 'icons/mob/human_races/r_bogani_small.dmi'
 	deform = 'icons/mob/human_races/r_bogani_small.dmi'
