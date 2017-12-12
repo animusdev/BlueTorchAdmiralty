@@ -228,7 +228,7 @@
 	else if(!href_list["late_join"])
 		new_player_panel()
 
-	if(href_list["showpoll"])
+/*	if(href_list["showpoll"])
 
 		handle_player_polling()
 		return
@@ -241,12 +241,12 @@
 		if(isnum(pollid))
 			src.poll_player(pollid)
 		return
-
+*/
 	if(href_list["invalid_jobs"])
 		show_invalid_jobs = !show_invalid_jobs
 		LateChoices()
 
-	if(href_list["votepollid"] && href_list["votetype"])
+/*	if(href_list["votepollid"] && href_list["votetype"])
 		var/pollid = text2num(href_list["votepollid"])
 		var/votetype = href_list["votetype"]
 		switch(votetype)
@@ -286,7 +286,7 @@
 				for(var/optionid = id_min; optionid <= id_max; optionid++)
 					if(!isnull(href_list["option_[optionid]"]))	//Test if this optionid was selected
 						vote_on_poll(pollid, optionid, 1)
-
+*/
 /mob/new_player/proc/IsJobAvailable(var/datum/job/job)
 	if(!job)	return 0
 	if(!job.is_position_available()) return 0
