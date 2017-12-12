@@ -66,10 +66,13 @@
 			ID = null
 			selected_outfit.Cut()
 		else
-			var/obj/item/weapon/card/id/I = M.get_active_hand()
-			if(I)
-				ID = I
-				M.drop_from_inventory(I,src)
+			if(istype(M.get_active_hand(), /obj/item/weapon/card/id))
+				var/obj/item/weapon/card/id/I = M.get_active_hand()
+				if(I)
+					ID = I
+					M.drop_from_inventory(I,src)
+			else
+				to_chat(usr, "You can only insert ID cards in here")
 		. = 1
 	if(href_list["get_all"])
 		var/list/addition = uniforms[href_list["get_all"]]

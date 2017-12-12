@@ -22,6 +22,9 @@
 	if(!istype(loc, /turf/))
 		to_chat(usr, "\The [src] has to be on a stable surface first!")
 		return
+	if(!CanPhysicallyInteract(usr))
+		to_chat(usr, "You don't have any kind of telekinesis.")
+		return
 	anchored = !anchored
 	screen_on = anchored
 	update_icon()
