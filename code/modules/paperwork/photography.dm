@@ -163,7 +163,7 @@ var/global/photo_count = 0
 /obj/item/device/camera/verb/change_size()
 	set name = "Set Photo Focus"
 	set category = "Object"
-	var/nsize = input("Photo Size","Pick a size of resulting photo.") as null|anything in list(1,3,5,7)
+	var/nsize = input("Photo Size","Pick a size of resulting photo.") as null|anything in list(1,3,5)
 	if(nsize)
 		size = nsize
 		to_chat(usr, "<span class='notice'>Camera will now take [size]x[size] photos.</span>")
@@ -233,8 +233,8 @@ var/global/photo_count = 0
 //Proc for capturing check
 /mob/living/proc/can_capture_turf(turf/T)
 	var/viewer = src
-	if(src.client)		//To make shooting through security cameras possible
-		viewer = src.client.eye
+	//if(src.client)		//To make shooting through security cameras possible
+	//	viewer = src.client.eye
 	var/can_see = (T in view(viewer))
 	return can_see
 
