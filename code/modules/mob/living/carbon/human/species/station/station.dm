@@ -72,8 +72,7 @@
 
 /datum/species/unathi
 	name = SPECIES_UNATHI
-	name_plural = SPECIES_UNATHI
-	spawn_flags = SPECIES_IS_RESTRICTED
+	name_plural = SPECIES_UNATHI	
 	icobase = 'icons/mob/human_races/r_lizard.dmi'
 	deform = 'icons/mob/human_races/r_def_lizard.dmi'
 	tail = "sogtail"
@@ -98,7 +97,6 @@
 	desert planet, they mostly hold ideals of honesty, virtue, martial combat and bravery above all \
 	else, frequently even their own lives. They prefer warmer temperatures than most species and \
 	their native tongue is a heavy hissing laungage called Sinta'Unathi."
-
 	cold_level_1 = 280 //Default 260 - Lower is better
 	cold_level_2 = 220 //Default 200
 	cold_level_3 = 130 //Default 120
@@ -107,7 +105,7 @@
 	heat_level_2 = 480 //Default 400
 	heat_level_3 = 1100 //Default 1000
 
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED
+	spawn_flags = SPECIES_CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 
 	flesh_color = "#34af10"
@@ -120,8 +118,7 @@
 
 	heat_discomfort_level = 295
 	heat_discomfort_strings = list(
-		"You feel soothingly warm.",
-		"You feel the heat sink into your bones.",
+		"You feel soothingly warm.",		"You feel the heat sink into your bones.",
 		"You feel warm enough to take a nap."
 		)
 
@@ -140,13 +137,12 @@
 /datum/species/tajaran
 	name = SPECIES_TAJARA
 	name_plural = "Tajaran"
-	spawn_flags = SPECIES_IS_RESTRICTED
 	icobase = 'icons/mob/human_races/r_tajaran.dmi'
 	deform = 'icons/mob/human_races/r_def_tajaran.dmi'
 	tail = "tajtail"
 	tail_animation = 'icons/mob/species/tajaran/tail.dmi'
 	default_h_style = "Tajaran Ears"
-	unarmed_types = list(/datum/unarmed_attack/stomp, /datum/unarmed_attack/kick, /datum/unarmed_attack/claws, /datum/unarmed_attack/bite/sharp)
+	unarmed_types = list(/datum/unarmed_attack/stomp, /datum/unarmed_attack/kick, /datum/unarmed_attack/claws, /datum/unarmed_attack/bite/sharp
 	darksight = 8
 	slowdown = -0.5
 	brute_mod = 1.15
@@ -155,16 +151,15 @@
 	num_alternate_languages = 2
 	secondary_langs = list(LANGUAGE_SIIK_MAAS, LANGUAGE_SIIK_TAJR)
 	name_language = LANGUAGE_SIIK_MAAS
-	health_hud_intensity = 1.75
+	health_hud_intensity = 1.7
 
 	min_age = 19
 	max_age = 140
-
 	blurb = "The Tajaran race is a species of long lived mammalian bipeds hailing from the planet of Ahdomai in the \
 	Shyihie system. They have been introduced to bluespace travel by the humans and Skrell, and their policies have been \
 	structured to prevent another reign of the Overseers. They hold a very spiritual outlook on life and \
 	have recently been fascinated by cybernetic enhancement. They prefer colder environments, \
-	and evolved a layer of thick fur to accommodate this. "
+	and evolved a layer of thick fur to accommodate this. 
 
 	cold_level_1 = 200 //Default 260
 	cold_level_2 = 140 //Default 200
@@ -173,10 +168,8 @@
 	heat_level_1 = 330 //Default 360
 	heat_level_2 = 380 //Default 400
 	heat_level_3 = 800 //Default 1000
-
 	primitive_form = "Farwa"
-
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED
+	spawn_flags = SPECIES_CAN_JOIN 
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 
 	flesh_color = "#afa59e"
@@ -184,13 +177,12 @@
 	blood_color = "#862a51"
 
 	reagent_tag = IS_TAJARA
-
 	move_trail = /obj/effect/decal/cleanable/blood/tracks/paw
 
 	heat_discomfort_level = 292
 	heat_discomfort_strings = list(
 		"Your fur prickles in the heat.",
-		"You feel uncomfortably warm.",
+		"You feel uncomfortably warm."
 		"Your overheated skin itches."
 		)
 	cold_discomfort_level = 275
@@ -203,7 +195,6 @@
 /datum/species/skrell
 	name = SPECIES_SKRELL
 	name_plural = SPECIES_SKRELL
-	spawn_flags = SPECIES_IS_RESTRICTED
 	icobase = 'icons/mob/human_races/r_skrell.dmi'
 	deform = 'icons/mob/human_races/r_def_skrell.dmi'
 	primitive_form = "Neaera"
@@ -223,7 +214,7 @@
 
 	darksight = 4
 
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED
+	spawn_flags = SPECIES_CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR
 
 	flesh_color = "#8cd7a3"
@@ -256,8 +247,7 @@
 
 /datum/species/diona
 	name = SPECIES_DIONA
-	name_plural = "Dionaea"
-	spawn_flags = SPECIES_IS_RESTRICTED
+	name_plural = "Dionaea"	
 	icobase = 'icons/mob/human_races/r_diona.dmi'
 	deform = 'icons/mob/human_races/r_def_plant.dmi'
 	language = LANGUAGE_ROOTLOCAL
@@ -330,7 +320,7 @@
 
 	flags = NO_SCAN | IS_PLANT | NO_PAIN | NO_SLIP
 	appearance_flags = 0
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN | SPECIES_NO_LACE
+	spawn_flags = SPECIES_CAN_JOIN | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN | SPECIES_NO_LACE
 
 	blood_color = "#004400"
 	flesh_color = "#907e4a"
