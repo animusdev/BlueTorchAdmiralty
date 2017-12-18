@@ -11,7 +11,6 @@
 	icobase = 'icons/mob/human_races/r_machine.dmi'
 	deform = 'icons/mob/human_races/r_machine.dmi'
 
-	spawn_flags = SPECIES_IS_RESTRICTED
 	language = LANGUAGE_EAL
 	unarmed_types = list(/datum/unarmed_attack/punch)
 	rarity_value = 2
@@ -40,7 +39,7 @@
 	passive_temp_gain = 5  // This should cause IPCs to stabilize at ~80 C in a 20 C environment.
 
 	flags = NO_SCAN | NO_PAIN | NO_POISON
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_LACE
+	spawn_flags = SPECIES_CAN_JOIN | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_LACE
 	appearance_flags = HAS_UNDERWEAR //IPCs can wear undies too :(
 
 	blood_color = "#1f181f"

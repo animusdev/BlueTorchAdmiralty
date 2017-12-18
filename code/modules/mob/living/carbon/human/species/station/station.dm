@@ -48,6 +48,7 @@
 			if(dam > maxdam && (maxdam == 0 || prob(50)) )
 				damaged_organ = E
 				maxdam = dam
+
 		var/datum/gender/T = gender_datums[H.get_gender()]
 		if(damaged_organ)
 			if(damaged_organ.status & ORGAN_BLEEDING)
@@ -72,8 +73,7 @@
 
 /datum/species/unathi
 	name = SPECIES_UNATHI
-	name_plural = SPECIES_UNATHI
-	spawn_flags = SPECIES_IS_RESTRICTED
+	name_plural = SPECIES_UNATHI	
 	icobase = 'icons/mob/human_races/r_lizard.dmi'
 	deform = 'icons/mob/human_races/r_def_lizard.dmi'
 	tail = "sogtail"
@@ -98,7 +98,7 @@
 	desert planet, they mostly hold ideals of honesty, virtue, martial combat and bravery above all \
 	else, frequently even their own lives. They prefer warmer temperatures than most species and \
 	their native tongue is a heavy hissing laungage called Sinta'Unathi."
-
+	
 	cold_level_1 = 280 //Default 260 - Lower is better
 	cold_level_2 = 220 //Default 200
 	cold_level_3 = 130 //Default 120
@@ -107,7 +107,7 @@
 	heat_level_2 = 480 //Default 400
 	heat_level_3 = 1100 //Default 1000
 
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED
+	spawn_flags = SPECIES_CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 
 	flesh_color = "#34af10"
@@ -140,7 +140,6 @@
 /datum/species/tajaran
 	name = SPECIES_TAJARA
 	name_plural = "Tajaran"
-	spawn_flags = SPECIES_IS_RESTRICTED
 	icobase = 'icons/mob/human_races/r_tajaran.dmi'
 	deform = 'icons/mob/human_races/r_def_tajaran.dmi'
 	tail = "tajtail"
@@ -159,7 +158,6 @@
 
 	min_age = 19
 	max_age = 140
-
 	blurb = "The Tajaran race is a species of long lived mammalian bipeds hailing from the planet of Ahdomai in the \
 	Shyihie system. They have been introduced to bluespace travel by the humans and Skrell, and their policies have been \
 	structured to prevent another reign of the Overseers. They hold a very spiritual outlook on life and \
@@ -173,10 +171,10 @@
 	heat_level_1 = 330 //Default 360
 	heat_level_2 = 380 //Default 400
 	heat_level_3 = 800 //Default 1000
-
+	
 	primitive_form = "Farwa"
-
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED
+	
+	spawn_flags = SPECIES_CAN_JOIN 
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 
 	flesh_color = "#afa59e"
@@ -184,7 +182,7 @@
 	blood_color = "#862a51"
 
 	reagent_tag = IS_TAJARA
-
+	
 	move_trail = /obj/effect/decal/cleanable/blood/tracks/paw
 
 	heat_discomfort_level = 292
@@ -203,7 +201,6 @@
 /datum/species/skrell
 	name = SPECIES_SKRELL
 	name_plural = SPECIES_SKRELL
-	spawn_flags = SPECIES_IS_RESTRICTED
 	icobase = 'icons/mob/human_races/r_skrell.dmi'
 	deform = 'icons/mob/human_races/r_def_skrell.dmi'
 	primitive_form = "Neaera"
@@ -223,7 +220,7 @@
 
 	darksight = 4
 
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED
+	spawn_flags = SPECIES_CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR
 
 	flesh_color = "#8cd7a3"
@@ -256,8 +253,7 @@
 
 /datum/species/diona
 	name = SPECIES_DIONA
-	name_plural = "Dionaea"
-	spawn_flags = SPECIES_IS_RESTRICTED
+	name_plural = "Dionaea"	
 	icobase = 'icons/mob/human_races/r_diona.dmi'
 	deform = 'icons/mob/human_races/r_def_plant.dmi'
 	language = LANGUAGE_ROOTLOCAL
@@ -330,7 +326,7 @@
 
 	flags = NO_SCAN | IS_PLANT | NO_PAIN | NO_SLIP
 	appearance_flags = 0
-	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN | SPECIES_NO_LACE
+	spawn_flags = SPECIES_CAN_JOIN | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN | SPECIES_NO_LACE
 
 	blood_color = "#004400"
 	flesh_color = "#907e4a"
