@@ -151,7 +151,7 @@ var/list/datum/power/changeling/powerinstances = list()
 	name = "Digital Camoflauge"
 	desc = "We evolve the ability to distort our form and proprtions, defeating common altgorthms used to detect lifeforms on cameras."
 	helptext = "We cannot be tracked by camera while using this skill.  However, humans looking at us will find us.. uncanny.  We must constantly expend chemicals to maintain our form like this."
-	genomecost = 10
+	genomecost = 1
 	allowduringlesserform = 1
 	verbpath = /mob/proc/changeling_digitalcamo
 
@@ -346,7 +346,7 @@ var/list/datum/power/changeling/powerinstances = list()
 	We can open most electrical locks, but it will be obvious when we do so."
 	helptext = "Use the ability, then touch something that utilizes an electrical locking system, to open it.  Each use costs 10 chemicals."
 //	ability_icon_state = "ling_electric_lockpick"
-	genomecost = 10
+	genomecost = 8
 	verbpath = /mob/proc/changeling_electric_lockpick
 
 //Emag-lite
@@ -447,7 +447,7 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "Running, and performing most acts will reveal us.  Our chemical regeneration is halted while we are hidden."
 	enhancedtext = "Can run while hidden."
 //	ability_icon_state = "ling_camoflage"
-	genomecost = 10
+	genomecost = 5
 	verbpath = /mob/proc/changeling_visible_camouflage
 
 //Hide us from anyone who would do us harm.
