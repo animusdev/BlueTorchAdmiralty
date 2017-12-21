@@ -165,8 +165,8 @@ var/list/datum/power/changeling/powerinstances = list()
 
 
 //////////////////////////////////////////////////////
-//������ ���, ������ ������. ���������.///////////////
-////////////������ ���������� �������������///////////
+//DeadPhilosof///////////////
+////////////PolarisAbility for Chang//////////
 //////////////////////////////////////////////////////
 
 
@@ -189,10 +189,10 @@ var/list/datum/power/changeling/powerinstances = list()
 	if(!changeling)
 		return 0
 	if(src.mind.changeling.recursive_enhancement)
-		src << "<span class='warning'>We will no longer empower our abilities.</span>"
+    	to_chat(src, "<span class='warning'>We will no longer empower our abilities.</span>")
 		src.mind.changeling.recursive_enhancement = 0
 		return 0
-	src << "<span class='notice'>We empower ourselves. Our abilities will now be extra potent.</span>"
+    to_chat(src, "<span class='notice'>We empower ourselves. Our abilities will now be extra potent.</span>")
 	src.mind.changeling.recursive_enhancement = 1
 	feedback_add_details("changeling_powers","RE")
 	return 1
@@ -213,7 +213,7 @@ var/list/datum/power/changeling/powerinstances = list()
 
 	if(src.mind.changeling.recursive_enhancement)
 		if(changeling_generic_weapon(/obj/item/weapon/melee/changeling/arm_blade/greater))
-			src << "<span class='notice'>We prepare an extra sharp blade.</span>"
+        	to_chat(src, "<span class='notice'>We prepare an extra sharp blade.</span>")
 			return 1
 
 	else
@@ -238,7 +238,7 @@ var/list/datum/power/changeling/powerinstances = list()
 
 	if(src.mind.changeling.recursive_enhancement)
 		if(changeling_generic_weapon(/obj/item/weapon/melee/changeling/claw/greater, 1, 15))
-			src << "<span class='notice'>We prepare an extra sharp claw.</span>"
+            to_chat(src, "<span class='notice'>We prepare an extra sharp claw.</span>")
 			return 1
 
 	else
@@ -378,7 +378,7 @@ var/list/datum/power/changeling/powerinstances = list()
 		loc << "<span class='notice'>We shape our finger to fit inside electronics, and are ready to force them open.</span>"
 
 /obj/item/weapon/finger_lockpick/dropped(mob/user)
-	user << "<span class='notice'>We discreetly shape our finger back to a less suspicious form.</span>"
+	to_chat(user, "<span class='notice'>We discreetly shape our finger back to a less suspicious form.</span>")
 	spawn(1)
 		if(src)
 			qdel(src)
@@ -394,14 +394,13 @@ var/list/datum/power/changeling/powerinstances = list()
 	var/datum/changeling/ling_datum = user.mind.changeling
 
 	if(ling_datum.chem_charges < 10)
-		user << "<span class='warning'>We require more chemicals to do that.</span>"
+     	to_chat(user, "<span class='warning'>We require more chemicals to do that.</span>")
 		return
 
 	//Airlocks require an ugly block of code, but we don't want to just call emag_act(), since we don't want to break airlocks forever.
 	if(istype(target,/obj/machinery/door))
 		var/obj/machinery/door/door = target
-		user << "<span class='notice'>We send an electrical pulse up our finger, and into \the [target], attempting to open it.</span>"
-
+     	to_chat(user, "<span class='notice'>We send an electrical pulse up our finger, and into \the [target], attempting to open it.</span>")
 		if(door.density && door.operable())
 			door.do_animate("spark")
 			sleep(6)
@@ -411,15 +410,15 @@ var/list/datum/power/changeling/powerinstances = list()
 
 				if(airlock.locked) //Check if we're bolted.
 					airlock.unlock()
-					user << "<span class='notice'>We've unlocked \the [airlock].  Another pulse is requried to open it.</span>"
+                 	to_chat(user, "<span class='notice'>We've unlocked \the [airlock].  Another pulse is requried to open it.</span>")
 				else	//We're not bolted, so open the door already.
 					airlock.open()
-					user << "<span class='notice'>We've opened \the [airlock].</span>"
+                   	to_chat(user, "<span class='notice'>We've opened \the [airlock].</span>")
 			else
 				door.open() //If we're a windoor, open the windoor.
-				user << "<span class='notice'>We've opened \the [door].</span>"
+                to_chat(user, "<span class='notice'>We've opened \the [door].</span>")
 		else //Probably broken or no power.
-			user << "<span class='warning'>The door does not respond to the pulse.</span>"
+            to_chat(user, "<span class='warning'>The door does not respond to the pulse.</span>")
 		door.add_fingerprint(user)
 		log_and_message_admins("finger-lockpicked \an [door].")
 		ling_datum.chem_charges -= 10
@@ -437,8 +436,8 @@ var/list/datum/power/changeling/powerinstances = list()
 	return 0
 
 ////////////////////////////////////////////
-//////////////////��� ������////////////////
-////////////////////////////////////////////
+//////////////////Invisible////////////////
+/////////////////DeadPhilosof/////////////////
 
 /datum/power/changeling/visible_camouflage
 	name = "Camouflage"
@@ -514,16 +513,8 @@ var/list/datum/power/changeling/powerinstances = list()
 		animate(src,alpha = 10, alpha = 255, time = 10)
 
 ////////////////////////////////////////////////////////
-////////////////////����� ���� ������///////////////////
-////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
+///////////////////Complete Polaris Code///////////////////
+///////////////////////DeadPhilosof////////////////
 
 
 
