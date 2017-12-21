@@ -44,7 +44,7 @@
 	return ..()
 
 
-/////////////Клока. Генки//////////////
+/////////////DeadPhilosof//////////////
 
 
 /mob/living/proc/set_m_intent(var/intent)
