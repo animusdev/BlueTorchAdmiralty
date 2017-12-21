@@ -20,7 +20,7 @@
 		return FALSE //M is too small to wield this
 	return TRUE
 
-////////////Еще генки///////
+////////////Deadphilosof///////
 /mob/proc/break_cloak()
 	return
 ////////////////////////////
