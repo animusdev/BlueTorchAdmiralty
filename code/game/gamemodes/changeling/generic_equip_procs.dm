@@ -32,7 +32,7 @@
 		return 1
 
 	if(M.head || M.wear_suit) //Make sure our slots aren't full
-		src << "<span class='warning'>We require nothing to be on our head, and we cannot wear any external suits, or shoes.</span>"
+	    to_chat(src, "<span class='warning'>We require nothing to be on our head, and we cannot wear any external suits, or shoes.</span>")
 		return 0
 
 	var/obj/item/clothing/suit/A = new armor_type(src)
