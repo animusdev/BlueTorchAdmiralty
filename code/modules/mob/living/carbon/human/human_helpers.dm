@@ -37,7 +37,7 @@
 		return list(HUMAN_EATING_BLOCKED_MOUTH, blocked)
 	return list(HUMAN_EATING_NO_ISSUE)
 
-//////////////Клока/////////////////////
+///////////////Deadphilosof/////////////////////
 
 //This is called when we want different types of 'cloaks' to stop working, e.g. when attacking.
 /mob/living/carbon/human/break_cloak()
@@ -49,7 +49,7 @@
 			if(cloaker.active)
 				cloaker.deactivate()
 
-/////////////Генокрады//////////////////
+/////////////What is that? Deadphilosof/////////////////
 #undef HUMAN_EATING_NO_ISSUE
 #undef HUMAN_EATING_NBP_MOUTH
 #undef HUMAN_EATING_BLOCKED_MOUTH
