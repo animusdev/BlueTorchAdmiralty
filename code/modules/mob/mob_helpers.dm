@@ -20,12 +20,6 @@
 		return FALSE //M is too small to wield this
 	return TRUE
 
-////////////Deadphilosof///////
-/mob/proc/break_cloak()
-	return
-////////////////////////////
-
-
 /mob/living/proc/isSynthetic()
 	return 0
 
