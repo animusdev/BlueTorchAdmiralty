@@ -203,7 +203,7 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "We may retract our armblade by dropping it.  It can deflect projectiles."
 	enhancedtext = "The blade will have armor peneratration."
 //	ability_icon_state = "ling_armblade"
-	genomecost = 2
+	genomecost = 8
 	verbpath = /mob/proc/changeling_arm_blade
 
 //Grows a scary, and powerful arm blade.
@@ -229,7 +229,7 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "We may retract our claw by dropping it."
 	enhancedtext = "The claw will have armor peneratration."
 //	ability_icon_state = "ling_claw"
-	genomecost = 1
+	genomecost = 6
 	verbpath = /mob/proc/changeling_claw
 
 //Grows a scary, and powerful arm blade.
@@ -347,7 +347,7 @@ var/list/datum/power/changeling/powerinstances = list()
 	We can open most electrical locks, but it will be obvious when we do so."
 	helptext = "Use the ability, then touch something that utilizes an electrical locking system, to open it.  Each use costs 10 chemicals."
 //	ability_icon_state = "ling_electric_lockpick"
-	genomecost = 3
+	genomecost = 10
 	verbpath = /mob/proc/changeling_electric_lockpick
 
 //Emag-lite
@@ -448,7 +448,7 @@ var/list/datum/power/changeling/powerinstances = list()
 	helptext = "Running, and performing most acts will reveal us.  Our chemical regeneration is halted while we are hidden."
 	enhancedtext = "Can run while hidden."
 //	ability_icon_state = "ling_camoflage"
-	genomecost = 3
+	genomecost = 10
 	verbpath = /mob/proc/changeling_visible_camouflage
 
 //Hide us from anyone who would do us harm.
