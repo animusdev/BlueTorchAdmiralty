@@ -41,6 +41,7 @@
 	down_gas_transfer_coefficient = 1
 	down_body_parts_covered = null
 	down_icon_state = "steriledown"
+	down_item_state = "steriledown"
 	pull_mask = 1
 
 /obj/item/clothing/mask/fakemoustache
