@@ -33,6 +33,12 @@
 	icon_state = "halfgas"
 	item_state = "halfgas"
 	siemens_coefficient = 0.7
+	down_gas_transfer_coefficient = 1
+	down_body_parts_covered = null
+	down_item_flags = FLEXIBLEMATERIAL
+	down_icon_state = "halfgas_up"
+	down_item_state = "halfgasdown"
+	pull_mask = 1
 	body_parts_covered = FACE
 	w_class = ITEM_SIZE_SMALL
 	armor = list(melee = 10, bullet = 10, laser = 10, energy = 0, bomb = 0, bio = 55, rad = 0)

@@ -12,6 +12,7 @@
 	down_body_parts_covered = null
 	down_item_flags = FLEXIBLEMATERIAL
 	down_icon_state = "breathdown"
+	down_item_state = "breathdown"
 	pull_mask = 1
 
 /obj/item/clothing/mask/breath/medical
@@ -27,7 +28,7 @@
 	icon_state = "medical"
 	item_state = "medical"
 	permeability_coefficient = 0.01
-	
+
 /obj/item/clothing/mask/breath/emergency
 	desc = "A close-fitting  mask that is used by the wallmounted emergency oxygen pump."
 	name = "emergency mask"
